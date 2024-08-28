@@ -1,1 +1,5 @@
-# EduPlug
+#                   Webstack - Portfolio Project
+----------------------------------------------------
+
+#                       *EduPlug*
+                        -------
