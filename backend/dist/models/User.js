@@ -36,7 +36,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
-// src/models/User.ts
 const mongoose_1 = __importStar(require("mongoose"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userSchema = new mongoose_1.Schema({
@@ -49,7 +48,7 @@ const userSchema = new mongoose_1.Schema({
     bio: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 // Password hashing middleware
 userSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {

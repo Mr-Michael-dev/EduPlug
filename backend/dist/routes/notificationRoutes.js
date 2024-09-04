@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const commentController_1 = require("../controllers/commentController");
 const auth_1 = require("../controllers/auth");
+const notificationController_1 = require("../controllers/notificationController");
 const router = express_1.default.Router();
-router.route('/:id/comments')
-    .post(auth_1.protect, commentController_1.addComment)
-    .get(commentController_1.getComments);
-router.route('/comments/:id')
-    .put(auth_1.protect, commentController_1.updateComment)
-    .delete(auth_1.protect, commentController_1.deleteComment);
+router.route('/')
+    .get(auth_1.protect, notificationController_1.getNotifications);
+router.route('/:id/read')
+    .put(auth_1.protect, notificationController_1.markAsRead);
+router.route('/:id')
+    .delete(auth_1.protect, notificationController_1.deleteNotification);
 exports.default = router;

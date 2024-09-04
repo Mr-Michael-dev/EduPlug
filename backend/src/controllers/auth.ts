@@ -55,60 +55,41 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as jwt.JwtPayload;
-    req.user = await User.findById(decoded.id) as IUser;
-
-    if (!req.user) {
-      res.status(401).json({ error: 'Not authorized, user not found' });
-      return;
-    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
+    req.user = (await User.findById(decoded.id).select('-password')) as IUser | undefined;
 
     next();
-  } catch (error: any) {
+  } catch (error) {
     res.status(401).json({ error: 'Not authorized, token failed' });
   }
 };
 
 export const getProfile = async (req: Request, res: Response): Promise<void> => {
-  try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Not authorized' });
-      return;
-    }
-
-    const user = await User.findById(req.user._id);
-    res.json(user);
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
-  }
+  res.json(req.user);
 };
 
 export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+  const { fullname, username, email, password, profilePicture, bio } = req.body;
+
   try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Not authorized' });
-      return;
-    }
+    const user = await User.findById(req.user?._id);
 
-    const user = await User.findById(req.user._id);
+    if (user) {
+      user.fullname = fullname || user.fullname;
+      user.username = username || user.username;
+      user.email = email || user.email;
+      user.profilePicture = profilePicture || user.profilePicture;
+      user.bio = bio || user.bio;
 
-    if (!user) {
+      if (password) {
+        user.password = password;
+      }
+
+      const updatedUser = await user.save();
+      res.json(updatedUser);
+    } else {
       res.status(404).json({ error: 'User not found' });
-      return;
     }
-
-    user.fullname = req.body.fullname || user.fullname;
-    user.username = req.body.username || user.username;
-    user.email = req.body.email || user.email;
-    user.bio = req.body.bio || user.bio;
-    user.profilePicture = req.body.profilePicture || user.profilePicture;
-
-    if (req.body.password) {
-      user.password = req.body.password;
-    }
-
-    await user.save();
-    res.json(user);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }

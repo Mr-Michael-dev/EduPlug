@@ -24,13 +24,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Comment = void 0;
-// src/models/Comment.ts
 const mongoose_1 = __importStar(require("mongoose"));
 const commentSchema = new mongoose_1.Schema({
     body: { type: String, required: true },
     author: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
     post: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Post', required: true },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 exports.Comment = mongoose_1.default.model('Comment', commentSchema);

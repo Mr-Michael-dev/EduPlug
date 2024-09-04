@@ -1,6 +1,5 @@
-// src/routes/postRoutes.ts
-import express, { Request, Response, NextFunction } from 'express';
-import { cache } from '../cache';
+import express from 'express';
+import { cache } from '../models/cache';
 import {
   createPost,
   getPosts,

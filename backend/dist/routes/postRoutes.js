@@ -3,9 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/routes/postRoutes.ts
 const express_1 = __importDefault(require("express"));
-const cache_1 = require("../cache");
+const cache_1 = require("../models/cache");
 const postController_1 = require("../controllers/postController");
 const auth_1 = require("../controllers/auth");
 const router = express_1.default.Router();

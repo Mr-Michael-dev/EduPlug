@@ -1,6 +1,19 @@
 import { createClient } from 'redis';
 import { Request, Response, NextFunction } from 'express';
 
+// import express from 'express';
+// import {
+//   createPost,
+//   getPosts,
+//   getPostById,
+//   updatePost,
+//   deletePost,
+//   likePost,
+// } from '../controllers/postController';
+// import { protect } from '../controllers/auth';
+
+// const router = express.Router();
+
 const client = createClient({
   url: process.env.REDIS_URL
 });
@@ -31,3 +44,16 @@ const cache = async (req: Request, res: Response, next: NextFunction) => {
 
 export { cache };
 
+// router.route('/')
+//   .post(protect, createPost)
+//   .get(getPosts); // Removed 'cache' middleware
+
+// router.route('/:id')
+//   .get(getPostById)
+//   .put(protect, updatePost)
+//   .delete(protect, deletePost);
+
+// router.route('/:id/like')
+//   .post(protect, likePost);
+
+// export default router;

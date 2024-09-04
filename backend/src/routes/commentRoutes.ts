@@ -1,4 +1,3 @@
-// src/routes/commentRoutes.ts
 import express from 'express';
 import {
   addComment,
@@ -10,7 +9,6 @@ import { protect } from '../controllers/auth';
 
 const router = express.Router();
 
-// Define routes with type annotations
 router.route('/:id/comments')
   .post(protect, addComment)
   .get(getComments);
@@ -20,4 +18,3 @@ router.route('/comments/:id')
   .delete(protect, deleteComment);
 
 export default router;
-

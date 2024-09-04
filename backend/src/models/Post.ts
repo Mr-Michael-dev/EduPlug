@@ -1,4 +1,3 @@
-// src/models/Post.ts
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IPost extends Document {
@@ -19,9 +18,7 @@ const postSchema = new Schema<IPost>({
   tags: { type: [String] },
   likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 // Create text index for search functionality
 postSchema.index({ title: 'text', body: 'text' });

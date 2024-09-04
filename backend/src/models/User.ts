@@ -1,4 +1,3 @@
-// src/models/User.ts
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
@@ -25,7 +24,7 @@ const userSchema = new Schema<IUser>({
   bio: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 // Password hashing middleware
 userSchema.pre<IUser>('save', async function (next) {

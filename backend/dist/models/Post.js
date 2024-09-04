@@ -24,7 +24,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Post = void 0;
-// src/models/Post.ts
 const mongoose_1 = __importStar(require("mongoose"));
 const postSchema = new mongoose_1.Schema({
     title: { type: String, required: true },
@@ -33,9 +32,7 @@ const postSchema = new mongoose_1.Schema({
     tags: { type: [String] },
     likes: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }],
     comments: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Comment' }],
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 // Create text index for search functionality
 postSchema.index({ title: 'text', body: 'text' });
 exports.Post = mongoose_1.default.model('Post', postSchema);

@@ -1,4 +1,3 @@
-// src/models/Notification.ts
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface INotification extends Document {
@@ -12,7 +11,6 @@ const notificationSchema = new Schema<INotification>({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   message: { type: String, required: true },
   isRead: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 export const Notification = mongoose.model<INotification>('Notification', notificationSchema);

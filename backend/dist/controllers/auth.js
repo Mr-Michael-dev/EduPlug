@@ -61,11 +61,7 @@ const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     }
     try {
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-        req.user = (yield User_1.User.findById(decoded.id));
-        if (!req.user) {
-            res.status(401).json({ error: 'Not authorized, user not found' });
-            return;
-        }
+        req.user = (yield User_1.User.findById(decoded.id).select('-password'));
         next();
     }
     catch (error) {
@@ -74,40 +70,29 @@ const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.protect = protect;
 const getProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        if (!req.user) {
-            res.status(401).json({ error: 'Not authorized' });
-            return;
-        }
-        const user = yield User_1.User.findById(req.user._id);
-        res.json(user);
-    }
-    catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+    res.json(req.user);
 });
 exports.getProfile = getProfile;
 const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const { fullname, username, email, password, profilePicture, bio } = req.body;
     try {
-        if (!req.user) {
-            res.status(401).json({ error: 'Not authorized' });
-            return;
+        const user = yield User_1.User.findById((_a = req.user) === null || _a === void 0 ? void 0 : _a._id);
+        if (user) {
+            user.fullname = fullname || user.fullname;
+            user.username = username || user.username;
+            user.email = email || user.email;
+            user.profilePicture = profilePicture || user.profilePicture;
+            user.bio = bio || user.bio;
+            if (password) {
+                user.password = password;
+            }
+            const updatedUser = yield user.save();
+            res.json(updatedUser);
         }
-        const user = yield User_1.User.findById(req.user._id);
-        if (!user) {
+        else {
             res.status(404).json({ error: 'User not found' });
-            return;
         }
-        user.fullname = req.body.fullname || user.fullname;
-        user.username = req.body.username || user.username;
-        user.email = req.body.email || user.email;
-        user.bio = req.body.bio || user.bio;
-        user.profilePicture = req.body.profilePicture || user.profilePicture;
-        if (req.body.password) {
-            user.password = req.body.password;
-        }
-        yield user.save();
-        res.json(user);
     }
     catch (error) {
         res.status(400).json({ error: error.message });
