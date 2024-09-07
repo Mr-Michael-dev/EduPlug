@@ -41,4 +41,4 @@ Compile the files,
 Backend/src/
 npx tsc
 Start app Backend/
-node dist/i Dec.js
+node dist/index.js
