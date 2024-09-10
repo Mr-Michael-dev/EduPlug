@@ -9,13 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPosts = exports.deletePost = exports.createPost = void 0;
+exports.likePost = exports.getPosts = exports.updatePost = exports.getPostById = exports.deletePost = exports.createPost = void 0;
 const Post_1 = require("../models/Post");
 // Create post for contributors
 const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) !== 'contributor') {
-        return res.status(403).json({ error: 'Only contributors can create posts' });
+        res.status(403).json({ error: 'Only contributors can create posts' });
+        return; // Return here after sending the response
     }
     const { title, content } = req.body;
     try {
@@ -28,23 +29,85 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.createPost = createPost;
-// Admins or post authors can delete
+// Delete post (Admins or post authors can delete)
 const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const post = yield Post_1.Post.findById(req.params.id);
     if (!post) {
-        return res.status(404).json({ error: 'Post not found' });
+        res.status(404).json({ error: 'Post not found' });
+        return;
     }
     if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) !== 'admin' && post.author.toString() !== ((_b = req.user) === null || _b === void 0 ? void 0 : _b._id.toString())) {
-        return res.status(403).json({ error: 'Unauthorized' });
+        res.status(403).json({ error: 'Unauthorized' });
+        return;
     }
-    yield post.remove();
+    yield post.deleteOne(); // Updated here
     res.json({ message: 'Post deleted' });
 });
 exports.deletePost = deletePost;
+const getPostById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const post = yield Post_1.Post.findById(req.params.id).populate('author', 'username');
+        if (!post) {
+            res.status(404).json({ error: 'Post not found' });
+            return;
+        }
+        res.json(post);
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+exports.getPostById = getPostById;
+const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const post = yield Post_1.Post.findById(req.params.id);
+        if (!post) {
+            res.status(404).json({ error: 'Post not found' });
+            return;
+        }
+        if (!req.user || post.author.toString() !== req.user._id.toString()) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+        }
+        post.title = req.body.title || post.title;
+        post.body = req.body.body || post.body;
+        post.tags = req.body.tags || post.tags;
+        yield post.save();
+        res.json(post);
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+exports.updatePost = updatePost;
 // Visitors can view posts
 const getPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const posts = yield Post_1.Post.find().populate('author', 'username').populate('comments');
     res.status(200).json(posts);
 });
 exports.getPosts = getPosts;
+const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const post = yield Post_1.Post.findById(req.params.id);
+        if (!post) {
+            res.status(404).json({ error: 'Post not found' });
+            return;
+        }
+        if (!req.user) {
+            res.status(401).json({ error: 'Not authorized' });
+            return;
+        }
+        if (!req.user) {
+            res.status(401).json({ error: 'Not authorized' });
+            return;
+        }
+        post.likes = post.likes.filter((user) => user.toString() !== req.user._id.toString());
+        yield post.save();
+        res.json(post);
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+exports.likePost = likePost;

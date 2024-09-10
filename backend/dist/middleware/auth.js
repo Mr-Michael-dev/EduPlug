@@ -24,7 +24,7 @@ const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     }
     try {
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || 'CLETA-REST-API');
-        req.user = yield User_1.UserModel.findById(decoded.id).select('-password');
+        req.user = yield User_1.User.findById(decoded.id).select('-password');
         next();
     }
     catch (error) {
