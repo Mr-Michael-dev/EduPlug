@@ -12,6 +12,7 @@ import commentRoutes from './routes/commentRoutes';
 import postRoutes from './routes/postRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import swaggerDocs from './swagger'; 
+import { router } from './routes'; // Adjust import based on your routes setup
 
 dotenv.config();
 
@@ -28,6 +29,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/notifications', notificationRoutes);
+// Middleware and routes setup
+app.use(express.json());
+app.use('/api', router);
 
 // Swagger Documentation
 swaggerDocs(app);
