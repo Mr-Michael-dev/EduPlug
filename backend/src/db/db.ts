@@ -19,7 +19,7 @@ const userSchema = new Schema<IUser>({
 });
 
 // Password matching method
-userSchema.methods.matchPassword = async function (password: string): Promise<boolean> {
+userSchema.methods.matchPassword = async function (password: string): Promise<Response> {
   return bcrypt.compare(password, this.password);
 };
 

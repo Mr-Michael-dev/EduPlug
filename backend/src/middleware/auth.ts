@@ -11,7 +11,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'CLETA-REST-API') as { id: string, role: string };
-    req.user = await UserModel.findById(decoded.id).select('-password');
+    req.user = await User.findById(decoded.id).select('-password');
     next();
   } catch (error) {
     res.status(401).json({ error: 'Not authorized, token failed' });
