@@ -30,17 +30,14 @@ app.use('/api/notifications', notificationRoutes_1.default);
 // Swagger Documentation
 (0, swagger_1.default)(app);
 const PORT = process.env.PORT || 5000;
-const MONGO_URL = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/edu-db-plug';
-// mongoose.connect(MONGO_URL);
-//   .then(() => console.log('MongoDB connected successfully'))
-//   .catch((error: Error) => console.error('MongoDB connection error:', error));
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-mongoose_1.default.connect(MONGO_URL)
+const mongoUrl = process.env.MONGODB_URI || '';
+mongoose_1.default.connect(mongoUrl)
     .then(() => {
     console.log('MongoDB connected successfully');
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 })
     .catch((error) => {
     console.error('MongoDB connection error:', error);
-    process.exit(1); // Exit the process with failure code
+    process.exit(1); // Exit the process if MongoDB connection fails
 });
+exports.default = app;

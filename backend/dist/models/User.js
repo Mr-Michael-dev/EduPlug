@@ -31,37 +31,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userSchema = new mongoose_1.Schema({
     fullname: { type: String, required: true },
-    username: { type: String, required: true, unique: true },
+    username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['user', 'contributor', 'admin'], default: 'user' },
-    profilePicture: { type: String },
-    bio: { type: String },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
-}, { timestamps: true });
-// Password hashing middleware
-userSchema.pre('save', function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!this.isModified('password'))
-            return next();
-        const salt = yield bcryptjs_1.default.genSalt(10);
-        this.password = yield bcryptjs_1.default.hash(this.password, salt);
-        next();
-    });
+    role: { type: String, enum: ['admin', 'contributor', 'visitor'], default: 'visitor' },
+    isVerified: { type: Boolean, default: false },
 });
-userSchema.methods.matchPassword = function (enteredPassword) {
+userSchema.methods.matchPassword = function (password) {
     return __awaiter(this, void 0, void 0, function* () {
-        return bcryptjs_1.default.compare(enteredPassword, this.password);
+        // Your bcrypt password comparison logic here
+        return false; // Replace with actual implementation
     });
 };
 exports.User = mongoose_1.default.model('User', userSchema);

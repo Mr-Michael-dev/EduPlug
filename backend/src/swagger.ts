@@ -1,4 +1,3 @@
-// src/swagger.ts
 import { Express } from 'express';
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
@@ -7,9 +6,9 @@ const options = {
   swaggerDefinition: {
     openapi: '3.0.0',
     info: {
-      title: 'Blog API',
+      title: 'EduPlug API',
       version: '1.0.0',
-      description: 'Blog API Documentation',
+      description: 'EduPlug API Documentation',
     },
     servers: [
       {
@@ -17,7 +16,7 @@ const options = {
       },
     ],
   },
-  apis: ['./routes/*.ts'], // Update to use TypeScript files
+  apis: ['./src/routes/*.ts'], // Include TypeScript routes for Swagger docs
 };
 
 const swaggerSpec = swaggerJsDoc(options);

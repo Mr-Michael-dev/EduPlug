@@ -1,52 +1,26 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
+export interface IUser extends Document {
+  username: string;
+  email: string;
+  password: string;
+  role: 'admin' | 'contributor' | 'visitor';
+  isVerified: boolean;
+  matchPassword(password: string): Promise<boolean>;
+}
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new Schema<IUser>({
   username: { type: String, required: true },
-  emanil: {type: String, required: true },
-  authentication: {
-    password: { type: String, required: true, select: false},
-    salt: {type: String, select: false },
-    sessionToken: { type: String, select: false },
-  },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'contributor', 'visitor'], default: 'visitor' },
+  isVerified: { type: Boolean, default: false },
 });
 
-export const UserModel = mongoose.model('User', UserSchema);
-
-export const getUser = () => UserModel.find();
-export const getUserByEmail = (email: string) => UserModel.findOne({ email });
-export const getUserBySessionTocken =(sessionTocken: string) => UserModel.findOne({
-  'authentication.sessionTocken,': sessionTocken,
-});
-export const getUserById = (id: string) => UserModel.findById(id);
-export const createUser = (values: Record<string, any>) => new UserModel(values)
-  .save().then((user) => user.toObject());
-export const deleteUserById = (id: string) => UserModel.findOneAndDelete({_id: id});
-export const updateUserById = (id: string, values: Record<string, any>) => {
-    return UserModel.findByIdAndUpdate(id, values);
+// Password matching method
+userSchema.methods.matchPassword = async function (password: string): Promise<boolean> {
+  return bcrypt.compare(password, this.password);
 };
 
-// import dotenv from 'dotenv';
-
-// dotenv.config();
-
-// const connectDB = async () => {
-//   const mongoUri = process.env.MONGO_URI;
-//   if (!mongoUri) {
-//     throw new Error('MONGO_URI is not defined');
-//   }
-
-//   try {
-//     await mongoose.connect(mongoUri, {
-//       useUnifiedTopology: true,
-//     } as mongoose.ConnectOptions);
-//     console.log('MongoDB connected successfully');
-//   } catch (err) {
-//     if (err instanceof Error) {
-//       console.error('MongoDB connection error:', err.message);
-//     }
-//     process.exit(1);
-//   }
-// };
-
-// export { connectDB };
+export const UserModel = mongoose.model<IUser>('User', userSchema);

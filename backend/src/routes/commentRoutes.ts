@@ -5,16 +5,18 @@ import {
   updateComment,
   deleteComment,
 } from '../controllers/commentController';
-import { protect } from '../controllers/auth';
+import { protect } from '../middleware/auth'; // Changed to use middleware for authentication
 
 const router = express.Router();
 
+// Routes for adding and getting comments for a specific post
 router.route('/:id/comments')
-  .post(protect, addComment)
-  .get(getComments);
+  .post(protect, addComment) // Protect route so only logged-in users can add comments
+  .get(getComments); // Anyone can get comments
 
+// Routes for updating and deleting specific comments
 router.route('/comments/:id')
-  .put(protect, updateComment)
-  .delete(protect, deleteComment);
+  .put(protect, updateComment) // Protect route for updating comments
+  .delete(protect, deleteComment); // Protect route for deleting comments
 
 export default router;

@@ -34,20 +34,32 @@ const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(201).json(comment);
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        if (error instanceof Error) {
+            res.status(400).json({ error: error.message });
+        }
+        else {
+            res.status(400).json({ error: 'An unknown error occurred' });
+        }
     }
 });
 exports.addComment = addComment;
+// Get comments for a post
 const getComments = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const comments = yield Comment_1.Comment.find({ post: req.params.id }).populate('author', 'username');
         res.json(comments);
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        if (error instanceof Error) {
+            res.status(400).json({ error: error.message });
+        }
+        else {
+            res.status(400).json({ error: 'An unknown error occurred' });
+        }
     }
 });
 exports.getComments = getComments;
+// Update a comment
 const updateComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const comment = yield Comment_1.Comment.findById(req.params.id);
@@ -64,10 +76,16 @@ const updateComment = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.json(comment);
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        if (error instanceof Error) {
+            res.status(400).json({ error: error.message });
+        }
+        else {
+            res.status(400).json({ error: 'An unknown error occurred' });
+        }
     }
 });
 exports.updateComment = updateComment;
+// Delete a comment
 const deleteComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const comment = yield Comment_1.Comment.findById(req.params.id);
@@ -83,7 +101,12 @@ const deleteComment = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.json({ message: 'Comment removed' });
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        if (error instanceof Error) {
+            res.status(400).json({ error: error.message });
+        }
+        else {
+            res.status(400).json({ error: 'An unknown error occurred' });
+        }
     }
 });
 exports.deleteComment = deleteComment;
