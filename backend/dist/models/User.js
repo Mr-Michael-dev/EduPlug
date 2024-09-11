@@ -31,9 +31,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userSchema = new mongoose_1.Schema({
     fullname: { type: String, required: true },
     username: { type: String, required: true },
@@ -44,8 +48,7 @@ const userSchema = new mongoose_1.Schema({
 });
 userSchema.methods.matchPassword = function (password) {
     return __awaiter(this, void 0, void 0, function* () {
-        // Your bcrypt password comparison logic here
-        return false; // Replace with actual implementation
+        return bcryptjs_1.default.compare(password, this.password);
     });
 };
 exports.User = mongoose_1.default.model('User', userSchema);
