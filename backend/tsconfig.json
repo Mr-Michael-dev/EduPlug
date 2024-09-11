@@ -11,7 +11,7 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "tests/auth.test.ts"],
   "exclude": ["node_modules"]
 }
 

@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { expect } from 'chai';
-import app from '../index'; // Ensure the app is properly exported
-import { client } from '../models/cache'; // Redis client
+import app from '../src/index'; // Ensure the app is properly exported
+import { client } from '../src/models/cache'; // Redis client
 
 describe('Comprehensive API Tests', () => {
 
