@@ -17,7 +17,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as { id: string; role: string };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'CLETA-REST-API') as { id: string; role: string };
     req.user = await User.findById(decoded.id).select('-password');
     next();
   } catch (error) {
@@ -40,7 +40,7 @@ export const register = async (req: Request, res: Response): Promise<Response> =
     const verificationCode = random();
 
     // Store verification code in Redis with an expiration time
-    redisClient.set(email, verificationCode, 900);
+    await redisClient.set(email, verificationCode, 900);
 
     // Send verification email using nodemailer
     const transporter = nodemailer.createTransport({
@@ -89,12 +89,12 @@ export const verifyEmail = async (req: Request, res: Response): Promise<Response
     }
 
     // get cached code from redis
-    const verificationToken = redisClient.get(email);
+    const verificationToken = await redisClient.get(email);
     if (!verificationToken) {
           return res.status(404).json({ error: 'Verification code not found' });
         }
     // delete the cached code from redis db
-    redisClient.del(email)
+    await redisClient.del(email)
 
     // verify code
     if (code === verificationToken) { 
