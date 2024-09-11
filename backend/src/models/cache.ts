@@ -1,19 +1,6 @@
 import { createClient } from 'redis';
 import { Request, Response, NextFunction } from 'express';
 
-// import express from 'express';
-// import {
-//   createPost,
-//   getPosts,
-//   getPostById,
-//   updatePost,
-//   deletePost,
-//   likePost,
-// } from '../controllers/postController';
-// import { protect } from '../controllers/auth';
-
-// const router = express.Router();
-
 const client = createClient({
   url: process.env.REDIS_URL
 });
@@ -21,6 +8,10 @@ const client = createClient({
 client.on('error', (err) => {
   console.error('Redis error:', err);
 });
+
+export { client };
+
+const cacheTimeout = process.env.CACHE_TIMEOUT || 600;
 
 const cache = async (req: Request, res: Response, next: NextFunction) => {
   const key = req.originalUrl || req.url;
@@ -30,9 +21,11 @@ const cache = async (req: Request, res: Response, next: NextFunction) => {
       res.send(JSON.parse(data));
     } else {
       const sendResponse = res.send.bind(res);
-      res.send = (body) => {
-        // Add your custom logic here
-        return res;
+      res.send = (body: any): Response => {
+        client.set(key, JSON.stringify(body), {
+          EX: typeof cacheTimeout === 'string' ? parseInt(cacheTimeout) : cacheTimeout
+        });
+        return sendResponse(body);  // Make sure to call the original send function
       };
       next();
     }
@@ -43,17 +36,3 @@ const cache = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export { cache };
-
-// router.route('/')
-//   .post(protect, createPost)
-//   .get(getPosts); // Removed 'cache' middleware
-
-// router.route('/:id')
-//   .get(getPostById)
-//   .put(protect, updatePost)
-//   .delete(protect, deletePost);
-
-// router.route('/:id/like')
-//   .post(protect, likePost);
-
-// export default router;

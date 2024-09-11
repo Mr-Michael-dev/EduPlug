@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Comment, IComment } from '../models/Comment';
+import { Comment } from '../models/Comment';
 import { Post } from '../models/Post';
 
 export const addComment = async (req: Request, res: Response): Promise<void> => {
@@ -26,20 +26,30 @@ export const addComment = async (req: Request, res: Response): Promise<void> => 
     await post.save();
 
     res.status(201).json(comment);
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: 'An unknown error occurred' });
+    }
   }
 };
 
+// Get comments for a post
 export const getComments = async (req: Request, res: Response): Promise<void> => {
   try {
     const comments = await Comment.find({ post: req.params.id }).populate('author', 'username');
     res.json(comments);
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: 'An unknown error occurred' });
+    }
   }
 };
 
+// Update a comment
 export const updateComment = async (req: Request, res: Response): Promise<void> => {
   try {
     const comment = await Comment.findById(req.params.id);
@@ -54,14 +64,18 @@ export const updateComment = async (req: Request, res: Response): Promise<void> 
     }
 
     comment.body = req.body.body || comment.body;
-
     await comment.save();
     res.json(comment);
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: 'An unknown error occurred' });
+    }
   }
 };
 
+// Delete a comment
 export const deleteComment = async (req: Request, res: Response): Promise<void> => {
   try {
     const comment = await Comment.findById(req.params.id);
@@ -77,7 +91,11 @@ export const deleteComment = async (req: Request, res: Response): Promise<void> 
 
     await comment.deleteOne();
     res.json({ message: 'Comment removed' });
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: 'An unknown error occurred' });
+    }
   }
 };

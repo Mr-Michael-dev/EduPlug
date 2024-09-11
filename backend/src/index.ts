@@ -6,13 +6,12 @@ import compression from 'compression';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-
-import userRoutes from './routes/userRoutes';
-import commentRoutes from './routes/commentRoutes';
-import postRoutes from './routes/postRoutes';
-import notificationRoutes from './routes/notificationRoutes';
 import swaggerDocs from './swagger';
 
+import commentRouter from './routes/commentRoutes';
+import postRouter from './routes/postRoutes';
+import userRouter from './routes/userRoutes';
+import notificationRouter from './routes/notificationRoutes';
 
 dotenv.config();
 
@@ -24,30 +23,28 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-// Routes
-app.use('/api/users', userRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/comments', commentRoutes);
-app.use('/api/notifications', notificationRoutes);
+app.use('/comments', commentRouter);
+app.use('/posts', postRouter);
+app.use('/users', userRouter);
+app.use('/notifications', notificationRouter);
+// Middleware and routes setup
+app.use(express.json());
+// app.use('/api', router);
 
 // Swagger Documentation
 swaggerDocs(app);
 
 const PORT = process.env.PORT || 5000;
-const MONGO_URL = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/edu-db-plug';
+const mongoUrl = process.env.MONGODB_URI || '';
 
-// mongoose.connect(MONGO_URL);
-//   .then(() => console.log('MongoDB connected successfully'))
-//   .catch((error: Error) => console.error('MongoDB connection error:', error));
-
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-mongoose.connect(MONGO_URL)
+mongoose.connect(mongoUrl)
   .then(() => {
     console.log('MongoDB connected successfully');
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch((error: Error) => {
     console.error('MongoDB connection error:', error);
-    process.exit(1); // Exit the process with failure code
+    process.exit(1); // Exit the process if MongoDB connection fails
   });
+
+export default app;

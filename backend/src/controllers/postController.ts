@@ -1,23 +1,17 @@
 import { Request, Response } from 'express';
-import { Post, IPost } from '../models/Post';
-import { User } from '../models/User';
+import { Post } from '../models/Post';
 
+
+// Create post for contributors
 export const createPost = async (req: Request, res: Response): Promise<void> => {
-  const { title, body, tags } = req.body;
+  if (req.user?.role !== 'contributor') {
+    res.status(403).json({ error: 'Only contributors can create posts' });
+    return; // Return here after sending the response
+  }
 
+  const { title, content } = req.body;
   try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Not authorized' });
-      return;
-    }
-
-    const post = new Post({
-      title,
-      body,
-      tags,
-      author: req.user._id,
-    });
-
+    const post = new Post({ title, content, author: req.user._id });
     await post.save();
     res.status(201).json(post);
   } catch (error: any) {
@@ -25,31 +19,22 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-export const getPosts = async (req: Request, res: Response): Promise<void> => {
-  const { search, tags, page = 1, limit = 10 } = req.query;
-  const query: any = {};
-
-  if (search) {
-    query.$text = { $search: search as string };
+// Delete post (Admins or post authors can delete)
+export const deletePost = async (req: Request, res: Response): Promise<void> => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    res.status(404).json({ error: 'Post not found' });
+    return;
   }
 
-  if (tags) {
-    query.tags = { $in: (tags as string).split(',') };
+  if (req.user?.role !== 'admin' && post.author.toString() !== req.user?._id.toString()) {
+    res.status(403).json({ error: 'Unauthorized' });
+    return;
   }
 
-  try {
-    const posts = await Post.find(query)
-      .populate('author', 'username')
-      .skip((Number(page) - 1) * Number(limit))
-      .limit(Number(limit));
-
-    const totalPosts = await Post.countDocuments(query);
-
-    res.json({ posts, totalPages: Math.ceil(totalPosts / Number(limit)) });
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
-  }
-};
+  await post.deleteOne(); // Updated here
+  res.json({ message: 'Post deleted' });
+}
 
 export const getPostById = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -88,25 +73,14 @@ export const updatePost = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-export const deletePost = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) {
-      res.status(404).json({ error: 'Post not found' });
-      return;
-    }
 
-    if (!req.user || post.author.toString() !== req.user._id.toString()) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
 
-    await post.deleteOne();
-    res.json({ message: 'Post removed' });
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
-  }
+// Visitors can view posts
+export const getPosts = async (req: Request, res: Response): Promise<void> => {
+  const posts = await Post.find().populate('author', 'username').populate('comments');
+  res.status(200).json(posts);
 };
+
 
 export const likePost = async (req: Request, res: Response): Promise<void> => {
   try {

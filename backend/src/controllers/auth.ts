@@ -1,96 +1,161 @@
+/// <reference types="express" />
+/// <reference path="../types/express/express.d.ts" />
+
+import { Request, Response, NextFunction } from 'express'; 
+import { User } from '../models/User';
+import { generateToken, hashPassword, random } from '../helpers';
+import nodemailer from 'nodemailer'; // For sending verification emails
 import jwt from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
-import { User, IUser } from '../models/User';
-import dotenv from 'dotenv';
 
-dotenv.config();
-
-export const register = async (req: Request, res: Response): Promise<void> => {
-  const { fullname, username, email, password } = req.body;
-
-  try {
-    const user = new User({ fullname, username, email, password });
-    await user.save();
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
-      expiresIn: '1h',
-    });
-
-    res.status(201).json({ token });
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-export const login = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await User.findOne({ email });
-    if (!user || !(await user.matchPassword(password))) {
-      res.status(401).json({ error: 'Invalid credentials' });
-      return;
-    }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
-      expiresIn: '1h',
-    });
-
-    res.json({ token });
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
+// Middleware for protecting routes
 export const protect = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  let token: string | undefined;
-
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    token = req.headers.authorization.split(' ')[1];
-  }
-
+  let token = req.headers.authorization?.split(' ')[1];
   if (!token) {
-    res.status(401).json({ error: 'Not authorized, no token' });
+    res.status(401).json({ error: 'Not authorized' });
     return;
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
-    req.user = (await User.findById(decoded.id).select('-password')) as IUser | undefined;
-
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as { id: string; role: string };
+    req.user = await User.findById(decoded.id).select('-password');
     next();
   } catch (error) {
     res.status(401).json({ error: 'Not authorized, token failed' });
   }
 };
 
-export const getProfile = async (req: Request, res: Response): Promise<void> => {
-  res.json(req.user);
-};
-
-export const updateProfile = async (req: Request, res: Response): Promise<void> => {
-  const { fullname, username, email, password, profilePicture, bio } = req.body;
+// Register a new user
+export const register = async (req: Request, res: Response): Promise<Response> => {
+  const { fullname, username, email, password, role } = req.body;
 
   try {
-    const user = await User.findById(req.user?._id);
+    const hashedPassword = hashPassword(password);
 
-    if (user) {
-      user.fullname = fullname || user.fullname;
-      user.username = username || user.username;
-      user.email = email || user.email;
-      user.profilePicture = profilePicture || user.profilePicture;
-      user.bio = bio || user.bio;
+    // Create new user
+    const user = new User({ fullname, username, email, password: hashedPassword, role, isVerified: false });
+    await user.save();
 
-      if (password) {
-        user.password = password;
+    // Generate verification code
+    const verificationCode = random();
+
+    // Send verification email using nodemailer
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    });
+
+    const mailOptions = {
+      from: 'noreply@example.com',
+      to: email,
+      subject: 'Verify Your Email',
+      text: `Your email verification code is: ${verificationCode}`,
+    };
+
+    transporter.sendMail(mailOptions, (error: Error | null, info: any) => {
+      if (error) {
+        console.error('Error sending verification email:', error);
+      } else {
+        console.log('Verification email sent:', info.response);
       }
+    });
 
-      const updatedUser = await user.save();
-      res.json(updatedUser);
+    return res.status(201).json({ message: 'User registered. Please check your email for verification.' });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({ error: error.message });
     } else {
-      res.status(404).json({ error: 'User not found' });
+      return res.status(400).json({ error: 'Unknown error occurred' });
     }
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
+  }
+};
+
+// Verify email
+export const verifyEmail = async (req: Request, res: Response): Promise<Response> => {
+  const { email, code } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user || user.isVerified) {
+      return res.status(404).json({ error: 'User not found or already verified' });
+    }
+
+    // Assuming the code was stored (in production, compare with the real one)
+    if (code === random()) { 
+      user.isVerified = true;
+      await user.save();
+      return res.json({ message: 'Email verified successfully' });
+    } else {
+      return res.status(400).json({ error: 'Invalid verification code' });
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    } else {
+      return res.status(500).json({ error: 'Unknown error occurred' });
+    }
+  }
+};
+
+// Login
+export const login = async (req: Request, res: Response): Promise<Response> => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!user.isVerified) {
+      return res.status(403).json({ error: 'Please verify your email' });
+    }
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = generateToken(user._id, user.role);
+    return res.status(200).json({ token, user });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    } else {
+      return res.status(500).json({ error: 'Unknown error occurred' });
+    }
+  }
+};
+
+// Get user profile
+export const getProfile = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const user = await User.findById(req.user?._id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    return res.json(user);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: 'Server error' });
+    } else {
+      return res.status(500).json({ error: 'Unknown error occurred' });
+    }
+  }
+};
+
+// Update user profile
+export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const user = await User.findByIdAndUpdate(req.user?._id, req.body, { new: true });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    return res.json(user);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: 'Server error' });
+    } else {
+      return res.status(500).json({ error: 'Unknown error occurred' });
+    }
   }
 };

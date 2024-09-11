@@ -9,21 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.likePost = exports.deletePost = exports.updatePost = exports.getPostById = exports.getPosts = exports.createPost = void 0;
+exports.likePost = exports.getPosts = exports.updatePost = exports.getPostById = exports.deletePost = exports.createPost = void 0;
 const Post_1 = require("../models/Post");
+// Create post for contributors
 const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, body, tags } = req.body;
+    var _a;
+    if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) !== 'contributor') {
+        res.status(403).json({ error: 'Only contributors can create posts' });
+        return; // Return here after sending the response
+    }
+    const { title, content } = req.body;
     try {
-        if (!req.user) {
-            res.status(401).json({ error: 'Not authorized' });
-            return;
-        }
-        const post = new Post_1.Post({
-            title,
-            body,
-            tags,
-            author: req.user._id,
-        });
+        const post = new Post_1.Post({ title, content, author: req.user._id });
         yield post.save();
         res.status(201).json(post);
     }
@@ -32,28 +29,22 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.createPost = createPost;
-const getPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { search, tags, page = 1, limit = 10 } = req.query;
-    const query = {};
-    if (search) {
-        query.$text = { $search: search };
+// Delete post (Admins or post authors can delete)
+const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const post = yield Post_1.Post.findById(req.params.id);
+    if (!post) {
+        res.status(404).json({ error: 'Post not found' });
+        return;
     }
-    if (tags) {
-        query.tags = { $in: tags.split(',') };
+    if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) !== 'admin' && post.author.toString() !== ((_b = req.user) === null || _b === void 0 ? void 0 : _b._id.toString())) {
+        res.status(403).json({ error: 'Unauthorized' });
+        return;
     }
-    try {
-        const posts = yield Post_1.Post.find(query)
-            .populate('author', 'username')
-            .skip((Number(page) - 1) * Number(limit))
-            .limit(Number(limit));
-        const totalPosts = yield Post_1.Post.countDocuments(query);
-        res.json({ posts, totalPages: Math.ceil(totalPosts / Number(limit)) });
-    }
-    catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+    yield post.deleteOne(); // Updated here
+    res.json({ message: 'Post deleted' });
 });
-exports.getPosts = getPosts;
+exports.deletePost = deletePost;
 const getPostById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const post = yield Post_1.Post.findById(req.params.id).populate('author', 'username');
@@ -90,25 +81,12 @@ const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updatePost = updatePost;
-const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const post = yield Post_1.Post.findById(req.params.id);
-        if (!post) {
-            res.status(404).json({ error: 'Post not found' });
-            return;
-        }
-        if (!req.user || post.author.toString() !== req.user._id.toString()) {
-            res.status(401).json({ error: 'Unauthorized' });
-            return;
-        }
-        yield post.deleteOne();
-        res.json({ message: 'Post removed' });
-    }
-    catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+// Visitors can view posts
+const getPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const posts = yield Post_1.Post.find().populate('author', 'username').populate('comments');
+    res.status(200).json(posts);
 });
-exports.deletePost = deletePost;
+exports.getPosts = getPosts;
 const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const post = yield Post_1.Post.findById(req.params.id);

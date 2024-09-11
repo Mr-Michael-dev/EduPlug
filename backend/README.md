@@ -25,6 +25,8 @@ sudo apt-get update
 sudo apt-get install -y docker.io
 
 
+
+
 # Pull and Run MongoDB Docker Image:
 sudo docker run --name mongodb -d -p 27017:27017 -v ~/data:/data/db mongo:5.0
 This command pulls the MongoDB 5.0 image, runs it in a Docker container, and maps port 27017 (MongoDB's default port) to your local machine.

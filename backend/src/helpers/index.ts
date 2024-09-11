@@ -1,12 +1,19 @@
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-const SECRET = 'CLETA-REST-API';
+const SECRET = process.env.JWT_SECRET || 'CLETA-REST-API';
 
-export const random = () => crypto.randomBytes(128).toString('base64');
+// Generate random string
+export const random = () => crypto.randomBytes(16).toString('hex');
 
-export const authentication = (salt: string, str: string, password: string) => {
-    // return crypto.createHmac('sha256', [salt, password].join('/')).update(SECRET).digest('hex');
-    return crypto.createHmac('sha256', [salt, password].join('/')).update(SECRET).digest('hex');
+// Hash password with salt
+export const hashPassword = (password: string): string => {
+  const salt = bcrypt.genSaltSync(10);
+  return bcrypt.hashSync(password, salt);
+};
 
-  };
-  
+// Generate JWT token
+export const generateToken = (userId: string, role: string) => {
+  return jwt.sign({ id: userId, role }, SECRET, { expiresIn: '1h' });
+};

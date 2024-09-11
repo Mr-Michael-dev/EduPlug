@@ -9,25 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cache = void 0;
+exports.cache = exports.client = void 0;
 const redis_1 = require("redis");
-// import express from 'express';
-// import {
-//   createPost,
-//   getPosts,
-//   getPostById,
-//   updatePost,
-//   deletePost,
-//   likePost,
-// } from '../controllers/postController';
-// import { protect } from '../controllers/auth';
-// const router = express.Router();
 const client = (0, redis_1.createClient)({
     url: process.env.REDIS_URL
 });
+exports.client = client;
 client.on('error', (err) => {
     console.error('Redis error:', err);
 });
+const cacheTimeout = process.env.CACHE_TIMEOUT || 600;
 const cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const key = req.originalUrl || req.url;
     try {
@@ -38,8 +29,10 @@ const cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         else {
             const sendResponse = res.send.bind(res);
             res.send = (body) => {
-                // Add your custom logic here
-                return res;
+                client.set(key, JSON.stringify(body), {
+                    EX: typeof cacheTimeout === 'string' ? parseInt(cacheTimeout) : cacheTimeout
+                });
+                return sendResponse(body); // Make sure to call the original send function
             };
             next();
         }
@@ -50,13 +43,3 @@ const cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.cache = cache;
-// router.route('/')
-//   .post(protect, createPost)
-//   .get(getPosts); // Removed 'cache' middleware
-// router.route('/:id')
-//   .get(getPostById)
-//   .put(protect, updatePost)
-//   .delete(protect, deletePost);
-// router.route('/:id/like')
-//   .post(protect, likePost);
-// export default router;
