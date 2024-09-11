@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const chai_1 = require("chai");
 const index_1 = __importDefault(require("../index")); // Ensure the app is properly exported
-const cache_1 = require("../models/cache"); // Redis client
+const redis_1 = __importDefault(require("../db/redis")); // Redis redisClient
 describe('Comprehensive API Tests', () => {
     // Test User Registration and Login
     describe('Authentication Tests', () => {
@@ -133,7 +133,7 @@ describe('Comprehensive API Tests', () => {
                 let res = yield (0, supertest_1.default)(index_1.default).get('/api/posts');
                 (0, chai_1.expect)(res.status).to.equal(200);
                 // Manually check Redis cache
-                const cacheData = yield cache_1.client.get('/api/posts');
+                const cacheData = yield redis_1.default.get('/api/posts');
                 (0, chai_1.expect)(cacheData).to.not.be.null;
                 // Second request (should retrieve from cache)
                 res = yield (0, supertest_1.default)(index_1.default).get('/api/posts');

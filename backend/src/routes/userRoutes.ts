@@ -1,12 +1,18 @@
 import { Router } from 'express';
-import { register, login, protect, getProfile, updateProfile } from '../controllers/auth'; // Remove getProfile and updateProfile
-// You can also re-add them here if you define them in auth.ts
+import {
+    register,
+    login,
+    protect,
+    getProfile,
+    updateProfile,
+    verifyEmail
+} from '../controllers/auth';
 
 const router = Router();
 
 router.post('/register', register);
 router.post('/login', login);
-router.get('/profile', protect, getProfile); // Add this back if the method is defined
-router.put('/profile', protect, updateProfile); // Add this back if the method is defined
-
+router.get('/profile', protect, getProfile); 
+router.put('/profile', protect, updateProfile);
+router.post('/verifyEmail', verifyEmail);
 export default router;

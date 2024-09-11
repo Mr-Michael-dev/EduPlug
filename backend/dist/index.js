@@ -22,10 +22,10 @@ app.use((0, cors_1.default)({ credentials: true }));
 app.use((0, compression_1.default)());
 app.use((0, cookie_parser_1.default)());
 app.use(body_parser_1.default.json());
-app.use('/comments', commentRoutes_1.default);
-app.use('/posts', postRoutes_1.default);
-app.use('/users', userRoutes_1.default);
-app.use('/notifications', notificationRoutes_1.default);
+app.use('/api/v1/comments', commentRoutes_1.default);
+app.use('/api/v1/posts', postRoutes_1.default);
+app.use('/api/v1/users', userRoutes_1.default);
+app.use('/api/v1/notifications', notificationRoutes_1.default);
 // Middleware and routes setup
 app.use(express_1.default.json());
 // app.use('/api', router);
@@ -36,7 +36,7 @@ const mongoUrl = process.env.MONGODB_URI || '';
 mongoose_1.default.connect(mongoUrl)
     .then(() => {
     console.log('MongoDB connected successfully');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    app.listen(PORT, () => console.log(`Server running on port ${PORT} goto 127.0.0.1:${PORT}/ to access sever`));
 })
     .catch((error) => {
     console.error('MongoDB connection error:', error);

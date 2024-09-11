@@ -1,5 +1,5 @@
 // const request = require('supertest');
-const app = require('../../dist/index'); // Adjust path as needed
+import app from '../../dist/index'; // Adjust path as needed
 
 // describe('GET /api/users', () => {
 //   it('should return a list of users', async () => {

@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { expect } from 'chai';
 import app from '../index'; // Ensure the app is properly exported
-import { client } from '../models/cache'; // Redis client
+import redisClient from '../db/redis'; // Redis redisClient
 
 describe('Comprehensive API Tests', () => {
 
@@ -136,7 +136,7 @@ describe('Comprehensive API Tests', () => {
         expect(res.status).to.equal(200);
   
         // Manually check Redis cache
-        const cacheData = await client.get('/api/posts');
+        const cacheData = await redisClient.get('/api/posts');
         expect(cacheData).to.not.be.null;
   
         // Second request (should retrieve from cache)

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc",
-    "serve": "node dist/index.js",
+    "serve": "nodemon dist/index.js",
     "lint": "eslint",
     "test": "mocha 'src/test/**/*.js'",
     "dev": "nodemon --exec babel-node --presets babel-preset-env src/server.ts",
@@ -46,7 +46,7 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/mocha": "^10.0.7",
     "@types/mongodb": "^4.0.6",
-    "@types/mongoose": "^5.11.96",
+    "@types/mongoose": "^5.11.97",
     "@types/nodemailer": "^6.4.15",
     "@types/supertest": "^6.0.2",
     "@types/swagger-jsdoc": "^6.0.4",

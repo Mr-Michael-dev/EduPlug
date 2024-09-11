@@ -8,30 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cache = exports.client = void 0;
-const redis_1 = require("redis");
-const client = (0, redis_1.createClient)({
-    url: process.env.REDIS_URL
-});
-exports.client = client;
-client.on('error', (err) => {
-    console.error('Redis error:', err);
-});
+exports.cache = void 0;
+const redis_1 = __importDefault(require("../db/redis"));
 const cacheTimeout = process.env.CACHE_TIMEOUT || 600;
 const cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const key = req.originalUrl || req.url;
     try {
-        const data = yield client.get(key);
+        const data = yield redis_1.default.get(key);
         if (data) {
             res.send(JSON.parse(data));
         }
         else {
             const sendResponse = res.send.bind(res);
             res.send = (body) => {
-                client.set(key, JSON.stringify(body), {
-                    EX: typeof cacheTimeout === 'string' ? parseInt(cacheTimeout) : cacheTimeout
-                });
+                redis_1.default.set(key, JSON.stringify(body), typeof cacheTimeout === 'string' ? parseInt(cacheTimeout) : cacheTimeout);
                 return sendResponse(body); // Make sure to call the original send function
             };
             next();

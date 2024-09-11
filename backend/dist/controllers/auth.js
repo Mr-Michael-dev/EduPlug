@@ -17,6 +17,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateProfile = exports.getProfile = exports.login = exports.verifyEmail = exports.register = exports.protect = void 0;
 const User_1 = require("../models/User");
 const helpers_1 = require("../helpers");
+const redis_1 = __importDefault(require("../db/redis")); // Redis redisClient
 const nodemailer_1 = __importDefault(require("nodemailer")); // For sending verification emails
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // Middleware for protecting routes
@@ -47,6 +48,8 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         yield user.save();
         // Generate verification code
         const verificationCode = (0, helpers_1.random)();
+        // Store verification code in Redis with an expiration time
+        redis_1.default.set(email, verificationCode, 900);
         // Send verification email using nodemailer
         const transporter = nodemailer_1.default.createTransport({
             service: 'Gmail',
@@ -82,12 +85,23 @@ exports.register = register;
 const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, code } = req.body;
     try {
+        // find user and check if verified
         const user = yield User_1.User.findOne({ email });
-        if (!user || user.isVerified) {
-            return res.status(404).json({ error: 'User not found or already verified' });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
         }
-        // Assuming the code was stored (in production, compare with the real one)
-        if (code === (0, helpers_1.random)()) {
+        if (user.isVerified) {
+            return res.status(403).json({ error: 'Email already verified' });
+        }
+        // get cached code from redis
+        const verificationToken = redis_1.default.get(email);
+        if (!verificationToken) {
+            return res.status(404).json({ error: 'Verification code not found' });
+        }
+        // delete the cached code from redis db
+        redis_1.default.del(email);
+        // verify code
+        if (code === verificationToken) {
             user.isVerified = true;
             yield user.save();
             return res.json({ message: 'Email verified successfully' });
