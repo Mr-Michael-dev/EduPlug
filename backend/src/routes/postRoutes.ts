@@ -1,4 +1,4 @@
-import express from 'express';
+import { Router } from 'express';
 import { cache } from '../models/cache';
 import {
   createPost,
@@ -10,7 +10,7 @@ import {
 } from '../controllers/postController';
 import { protect } from '../middleware/auth'; // Changed middleware path
 
-const router = express.Router();
+const router = Router();
 
 // Routes for creating a post and getting all posts (with caching)
 router.route('/')

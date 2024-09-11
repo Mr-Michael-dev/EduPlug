@@ -1,13 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
+const express_1 = require("express");
 const cache_1 = require("../models/cache");
 const postController_1 = require("../controllers/postController");
 const auth_1 = require("../middleware/auth"); // Changed middleware path
-const router = express_1.default.Router();
+const router = (0, express_1.Router)();
 // Routes for creating a post and getting all posts (with caching)
 router.route('/')
     .post(auth_1.protect, postController_1.createPost) // Protect route for creating posts

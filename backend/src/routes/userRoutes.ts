@@ -1,8 +1,8 @@
-import express from 'express';
+import { Router } from 'express';
 import { register, login, protect, getProfile, updateProfile } from '../controllers/auth'; // Remove getProfile and updateProfile
 // You can also re-add them here if you define them in auth.ts
 
-const router = express.Router();
+const router = Router();
 
 router.post('/register', register);
 router.post('/login', login);

@@ -6,13 +6,12 @@ import compression from 'compression';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import swaggerDocs from './swagger';
 
-import userRoutes from './routes/userRoutes';
-import commentRoutes from './routes/commentRoutes';
-import postRoutes from './routes/postRoutes';
-import notificationRoutes from './routes/notificationRoutes';
-import swaggerDocs from './swagger'; 
-import { router } from './routes'; // Adjust import based on your routes setup
+import commentRouter from './routes/commentRoutes';
+import postRouter from './routes/postRoutes';
+import userRouter from './routes/userRoutes';
+import notificationRouter from './routes/notificationRoutes';
 
 dotenv.config();
 
@@ -24,14 +23,13 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-// Routes
-app.use('/api/users', userRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/comments', commentRoutes);
-app.use('/api/notifications', notificationRoutes);
+app.use('/comments', commentRouter);
+app.use('/posts', postRouter);
+app.use('/users', userRouter);
+app.use('/notifications', notificationRouter);
 // Middleware and routes setup
 app.use(express.json());
-app.use('/api', router);
+// app.use('/api', router);
 
 // Swagger Documentation
 swaggerDocs(app);

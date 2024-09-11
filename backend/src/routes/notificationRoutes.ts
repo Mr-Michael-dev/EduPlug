@@ -1,4 +1,4 @@
-import express from 'express';
+import { Router } from 'express';
 import { protect } from '../middleware/auth'; // Changed to middleware path
 import {
   getNotifications,
@@ -6,7 +6,7 @@ import {
   deleteNotification,
 } from '../controllers/notificationController';
 
-const router = express.Router();
+const router = Router();
 
 // Routes for getting all notifications for logged-in users
 router.route('/')
