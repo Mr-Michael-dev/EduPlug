@@ -36,7 +36,7 @@ const mongoUrl = process.env.MONGODB_URI || '';
 mongoose_1.default.connect(mongoUrl)
     .then(() => {
     console.log('MongoDB connected successfully');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT} goto 127.0.0.1:${PORT}/ to access sever`));
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}.\nVisit http://127.0.0.1:${PORT}/api/v1/ to access sever`));
 })
     .catch((error) => {
     console.error('MongoDB connection error:', error);

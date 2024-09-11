@@ -20,13 +20,19 @@ const cache = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     try {
         const data = yield redis_1.default.get(key);
         if (data) {
+            // If cache hit, send the cached data
             res.send(JSON.parse(data));
         }
         else {
+            // If cache miss, proceed to the next middleware/route handler
             const sendResponse = res.send.bind(res);
             res.send = (body) => {
-                redis_1.default.set(key, JSON.stringify(body), typeof cacheTimeout === 'string' ? parseInt(cacheTimeout) : cacheTimeout);
-                return sendResponse(body); // Make sure to call the original send function
+                sendResponse(body); // Send the response immediately
+                // After response is sent, store it in Redis cache
+                redis_1.default.set(key, JSON.stringify(body), typeof cacheTimeout === 'string' ? parseInt(cacheTimeout) : cacheTimeout).catch((err) => {
+                    console.error('Redis set error:', err);
+                });
+                return res; // Return the response object
             };
             next();
         }

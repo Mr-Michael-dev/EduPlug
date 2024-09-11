@@ -12,63 +12,60 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // module contains a class RedisClient that defines
 // a connection to redisClient and a set and get method
 const redis_1 = require("redis");
-const util_1 = require("util");
 class RedisClient {
-    // constructor initializes the RedisClient instance
     constructor() {
-        this.client = (0, redis_1.createClient)({ url: process.env.REDIS_URL });
-        this.client.on('error', (err) => {
-            console.error(`Error connecting to redis client: ${err}`);
+        this.client = (0, redis_1.createClient)({
+            url: process.env.REDIS_URL || 'redis://localhost:6379'
         });
-        // Promisify the get function after the client is initialized
-        this.getAsync = (0, util_1.promisify)(this.client.get).bind(this.client);
-        this.setAsync = (0, util_1.promisify)(this.client.set).bind(this.client);
-        this.delAsync = (0, util_1.promisify)(this.client.del).bind(this.client);
-        this.expireAsync = (0, util_1.promisify)(this.client.expire).bind(this.client);
+        this.client.on('error', (err) => {
+            console.error(`Error connecting to Redis client: ${err}`);
+        });
+        this.client.connect().catch((err) => {
+            console.error('Redis connection error:', err);
+        });
     }
     isAlive() {
-        // returns true when the connection to Redis is a success otherwise, false
-        try {
-            this.client.ping();
-            return true;
-        }
-        catch (err) {
-            return false;
-        }
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.client.ping(); // Await the ping operation
+                return true;
+            }
+            catch (err) {
+                console.error('Ping error:', err);
+                return false;
+            }
+        });
     }
     get(key) {
         return __awaiter(this, void 0, void 0, function* () {
-            // takes a string key as argument and returns the Redis value stored for this key
             try {
-                const value = yield this.getAsync(key);
+                const value = yield this.client.get(key);
                 return value;
             }
             catch (err) {
+                console.error(`Error getting key ${key}:`, err);
                 return null;
             }
         });
     }
     set(key, value, duration) {
         return __awaiter(this, void 0, void 0, function* () {
-            // takes a string key, a value and a duration in second as arguments
-            // to store it in Redis (with an expiration set by the duration argument)
             try {
-                yield this.setAsync(key, value);
-                yield this.expireAsync(key, duration);
+                yield this.client.set(key, value);
+                yield this.client.expire(key, duration);
             }
             catch (err) {
-                console.log(`error setting ${key} : ${value}: ${err}`);
+                console.error(`Error setting key ${key}:`, err);
             }
         });
     }
     del(key) {
         return __awaiter(this, void 0, void 0, function* () {
-            // takes a string key as argument and remove the value in Redis for this key
             try {
-                yield this.delAsync(key);
+                yield this.client.del(key);
             }
             catch (err) {
-                console.log(`error deleting key ${key}`);
+                console.error(`Error deleting key ${key}:`, err);
             }
         });
     }
