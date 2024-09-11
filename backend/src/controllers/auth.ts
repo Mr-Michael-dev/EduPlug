@@ -4,6 +4,7 @@
 import { Request, Response, NextFunction } from 'express'; 
 import { User } from '../models/User';
 import { generateToken, hashPassword, random } from '../helpers';
+import redisClient from '../db/redis'; // Redis redisClient
 import nodemailer from 'nodemailer'; // For sending verification emails
 import jwt from 'jsonwebtoken';
 
@@ -37,6 +38,9 @@ export const register = async (req: Request, res: Response): Promise<Response> =
 
     // Generate verification code
     const verificationCode = random();
+
+    // Store verification code in Redis with an expiration time
+    redisClient.set(email, verificationCode, 900);
 
     // Send verification email using nodemailer
     const transporter = nodemailer.createTransport({
@@ -74,13 +78,26 @@ export const verifyEmail = async (req: Request, res: Response): Promise<Response
   const { email, code } = req.body;
 
   try {
+    // find user and check if verified
     const user = await User.findOne({ email });
-    if (!user || user.isVerified) {
-      return res.status(404).json({ error: 'User not found or already verified' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    // Assuming the code was stored (in production, compare with the real one)
-    if (code === random()) { 
+    if (user.isVerified) {
+      return res.status(403).json({ error: 'Email already verified' });
+    }
+
+    // get cached code from redis
+    const verificationToken = redisClient.get(email);
+    if (!verificationToken) {
+          return res.status(404).json({ error: 'Verification code not found' });
+        }
+    // delete the cached code from redis db
+    redisClient.del(email)
+
+    // verify code
+    if (code === verificationToken) { 
       user.isVerified = true;
       await user.save();
       return res.json({ message: 'Email verified successfully' });
