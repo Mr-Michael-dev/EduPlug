@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc",
-    "serve": "node dist/index.js",
+    "serve": "nodemon dist/index.js",
     "lint": "eslint",
     "test": "mocha 'src/test/**/*.js'",
     "dev": "nodemon --exec babel-node --presets babel-preset-env src/server.ts",

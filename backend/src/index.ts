@@ -23,10 +23,10 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-app.use('/comments', commentRouter);
-app.use('/posts', postRouter);
-app.use('/users', userRouter);
-app.use('/notifications', notificationRouter);
+app.use('/api/v1/comments', commentRouter);
+app.use('/api/v1/posts', postRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/notifications', notificationRouter);
 // Middleware and routes setup
 app.use(express.json());
 // app.use('/api', router);
@@ -40,7 +40,7 @@ const mongoUrl = process.env.MONGODB_URI || '';
 mongoose.connect(mongoUrl)
   .then(() => {
     console.log('MongoDB connected successfully');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    app.listen(PORT, () => console.log(`Server running on port ${PORT} goto 127.0.0.1:${PORT}/ to access sever`));
   })
   .catch((error: Error) => {
     console.error('MongoDB connection error:', error);
