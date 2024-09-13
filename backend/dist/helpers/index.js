@@ -1,25 +1,20 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateToken = exports.hashPassword = exports.random = void 0;
-const crypto_1 = __importDefault(require("crypto"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 const SECRET = process.env.JWT_SECRET || 'CLETA-REST-API';
 // Generate random string
-const random = () => crypto_1.default.randomBytes(16).toString('hex');
-exports.random = random;
+export const random = () => crypto.randomBytes(16).toString('hex');
 // Hash password with salt
-const hashPassword = (password) => {
-    const salt = bcryptjs_1.default.genSaltSync(10);
-    return bcryptjs_1.default.hashSync(password, salt);
+export const hashPassword = (password) => {
+    const salt = bcrypt.genSaltSync(10);
+    return bcrypt.hashSync(password, salt);
 };
-exports.hashPassword = hashPassword;
 // Generate JWT token
-const generateToken = (userId, role) => {
-    return jsonwebtoken_1.default.sign({ id: userId, role }, SECRET, { expiresIn: '1h' });
+export const generateToken = (userId, role) => {
+    return jwt.sign({ id: userId, role }, SECRET, { expiresIn: '1h' });
 };
+<<<<<<< HEAD
 exports.generateToken = generateToken;
 //# sourceMappingURL=index.js.map
+=======
+>>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { cache } from '../models/cache';
+import { cache } from '../models/cache.js';
 import {
   createPost,
   getPosts,
@@ -7,8 +7,8 @@ import {
   updatePost,
   deletePost,
   likePost,
-} from '../controllers/postController';
-import { protect } from '../middleware/auth'; // Changed middleware path
+} from '../controllers/postController.js';
+import { protect } from '../middleware/auth.js'; // Changed middleware path
 
 const router = Router();
 

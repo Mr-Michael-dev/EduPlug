@@ -38,3 +38,9 @@ npm install typescript @types/node @types/express @types/mongoose
 npx tsc --init
 npm install --save-dev @types/bcryptjs @types/jsonwebtoken @types/swagger-jsdoc @types/swagger-ui-express
 
+
+Compile the files,
+Backend/src/
+npx tsc
+Start app Backend/
+node dist/index.js

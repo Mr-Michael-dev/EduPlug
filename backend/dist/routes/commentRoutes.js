@@ -1,20 +1,22 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const commentController_1 = require("../controllers/commentController");
-const auth_1 = require("../middleware/auth"); // Changed to use middleware for authentication
-const router = (0, express_1.Router)();
+import { Router } from 'express';
+import { addComment, getComments, updateComment, deleteComment, } from '../controllers/commentController.js';
+import { protect } from '../middleware/auth.js'; // Changed to use middleware for authentication
+const router = Router();
 // Define routes
 router.get('/', (req, res) => {
     res.send('Comments route');
     // Routes for adding and getting comments for a specific post
     router.route('/:id/comments')
-        .post(auth_1.protect, commentController_1.addComment) // Protect route so only logged-in users can add comments
-        .get(commentController_1.getComments); // Anyone can get comments
+        .post(protect, addComment) // Protect route so only logged-in users can add comments
+        .get(getComments); // Anyone can get comments
     // Routes for updating and deleting specific comments
     router.route('/comments/:id')
-        .put(auth_1.protect, commentController_1.updateComment) // Protect route for updating comments
-        .delete(auth_1.protect, commentController_1.deleteComment); // Protect route for deleting comments
+        .put(protect, updateComment) // Protect route for updating comments
+        .delete(protect, deleteComment); // Protect route for deleting comments
 });
+<<<<<<< HEAD
 exports.default = router;
 //# sourceMappingURL=commentRoutes.js.map
+=======
+export default router;
+>>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f

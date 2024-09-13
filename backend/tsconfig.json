@@ -20,10 +20,8 @@
 // }
 {
   "compilerOptions": {
-    "module": "commonjs",
     "target": "ES2020",
-    "declaration": true,
-    "sourceMap": true,
+    "module": "ES2020",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -31,10 +29,10 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "typeRoots": ["./node_modules/@types", "./src/types"],
-    "resolveJsonModule": true,
-    "moduleResolution": "node"
+    "moduleResolution": "Node",
+    "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "src/test/auth.test.ts", "src/test/api.test.ts"],
+  "include": ["src/**/*.ts", "tests/auth.test.ts"],
   "exclude": ["node_modules"]
 }
 

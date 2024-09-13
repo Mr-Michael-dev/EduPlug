@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26,6 +27,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const userSchema = new mongoose_1.Schema({
+=======
+import mongoose, { Schema } from 'mongoose';
+import bcrypt from 'bcryptjs';
+const userSchema = new Schema({
+>>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f
     fullname: { type: String, required: true },
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -34,8 +40,14 @@ const userSchema = new mongoose_1.Schema({
     isVerified: { type: Boolean, default: false },
 });
 userSchema.methods.matchPassword = async function (password) {
+<<<<<<< HEAD
     // Your bcrypt password comparison logic here
     return false; // Replace with actual implementation
 };
 exports.User = mongoose_1.default.model('User', userSchema);
 //# sourceMappingURL=User.js.map
+=======
+    return bcrypt.compare(password, this.password);
+};
+export const User = mongoose.model('User', userSchema);
+>>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f

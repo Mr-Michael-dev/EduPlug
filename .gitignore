@@ -6,3 +6,6 @@ node_modules/
 
 # Ignore all .env files
 .env
+
+# ignore dump.rdb
+dump.rdb

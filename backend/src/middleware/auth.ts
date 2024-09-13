@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import { User } from '../models/User';
+import { User } from '../models/User.js';
 
 export const protect = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   let token = req.headers.authorization?.split(' ')[1];
