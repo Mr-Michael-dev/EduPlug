@@ -13,6 +13,12 @@ import postRouter from './routes/postRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import notificationRouter from './routes/notificationRoutes.js';
 
+import { fileURLToPath } from 'url';
+
+// Get __filename and __dirname in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 dotenv.config();
 
 const app = express();
