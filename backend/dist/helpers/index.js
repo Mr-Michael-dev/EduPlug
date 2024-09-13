@@ -22,3 +22,4 @@ const generateToken = (userId, role) => {
     return jsonwebtoken_1.default.sign({ id: userId, role }, SECRET, { expiresIn: '1h' });
 };
 exports.generateToken = generateToken;
+//# sourceMappingURL=index.js.map

@@ -18,3 +18,4 @@ router.route('/:id')
 router.route('/:id/like')
     .post(auth_1.protect, postController_1.likePost); // Protect route for liking posts
 exports.default = router;
+//# sourceMappingURL=postRoutes.js.map

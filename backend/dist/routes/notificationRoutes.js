@@ -14,3 +14,4 @@ router.route('/:id/read')
 router.route('/:id')
     .delete(auth_1.protect, notificationController_1.deleteNotification); // Protect route for deleting notifications
 exports.default = router;
+//# sourceMappingURL=notificationRoutes.js.map

@@ -9,3 +9,4 @@ router.post('/login', auth_1.login);
 router.get('/profile', auth_1.protect, auth_1.getProfile); // Add this back if the method is defined
 router.put('/profile', auth_1.protect, auth_1.updateProfile); // Add this back if the method is defined
 exports.default = router;
+//# sourceMappingURL=userRoutes.js.map

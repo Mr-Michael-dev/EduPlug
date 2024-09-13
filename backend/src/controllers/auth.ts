@@ -1,5 +1,5 @@
 /// <reference types="express" />
-/// <reference path="../types/express/express.d.ts" />
+/// <reference path="../../express.d.ts" />
 
 import { Request, Response, NextFunction } from 'express'; 
 import { User } from '../models/User';

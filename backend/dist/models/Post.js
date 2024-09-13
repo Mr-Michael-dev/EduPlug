@@ -36,3 +36,4 @@ const postSchema = new mongoose_1.Schema({
 // Create text index for search functionality
 postSchema.index({ title: 'text', body: 'text' });
 exports.Post = mongoose_1.default.model('Post', postSchema);
+//# sourceMappingURL=Post.js.map

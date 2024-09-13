@@ -1,17 +1,27 @@
-import express from 'express';
-import http from 'http';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import compression from 'compression';
-import cors from 'cors';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import swaggerDocs from './swagger';
+const express = require('express');
+const http = require('http');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const compression = require('compression');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const swaggerDocs = require('./swagger');
 
-import commentRouter from './routes/commentRoutes';
-import postRouter from './routes/postRoutes';
-import userRouter from './routes/userRoutes';
-import notificationRouter from './routes/notificationRoutes';
+// import express from 'express';
+// import http from 'http';
+// import bodyParser from 'body-parser';
+// import cookieParser from 'cookie-parser';
+// import compression from 'compression';
+// import cors from 'cors';
+// import mongoose from 'mongoose';
+// import dotenv from 'dotenv';
+// import swaggerDocs from './swagger';
+
+const commentRouter = require('./routes/commentRoutes');
+const postRouter = require ('./routes/postRoutes');
+const userRouter  = require('./routes/userRoutes');
+const notificationRouter = require('./routes/notificationRoutes');
 
 dotenv.config();
 
@@ -47,4 +57,5 @@ mongoose.connect(mongoUrl)
     process.exit(1); // Exit the process if MongoDB connection fails
   });
 
+// module.exports = app;
 export default app;

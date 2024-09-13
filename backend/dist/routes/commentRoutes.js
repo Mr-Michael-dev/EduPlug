@@ -17,3 +17,4 @@ router.get('/', (req, res) => {
         .delete(auth_1.protect, commentController_1.deleteComment); // Protect route for deleting comments
 });
 exports.default = router;
+//# sourceMappingURL=commentRoutes.js.map

@@ -31,3 +31,4 @@ const commentSchema = new mongoose_1.Schema({
     post: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Post', required: true },
 }, { timestamps: true });
 exports.Comment = mongoose_1.default.model('Comment', commentSchema);
+//# sourceMappingURL=Comment.js.map
