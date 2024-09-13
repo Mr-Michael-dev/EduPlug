@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User.js';
 
+// middleware for protecting routes
 export const protect = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   let token = req.headers.authorization?.split(' ')[1];
   if (!token) {
@@ -18,6 +19,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
   }
 };
 
+// middleware for authorizing roles
 export const authorizeRoles = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!roles.includes(req.user?.role)) {
