@@ -7,6 +7,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: 'admin' | 'contributor' | 'visitor';
+  profilePic: string | null;
   isVerified: boolean;
   matchPassword(password: string): Promise<boolean>;
 }
@@ -17,6 +18,7 @@ const userSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['admin', 'contributor', 'visitor'], default: 'visitor' },
+  profilePic: { type: String, default: '' },
   isVerified: { type: Boolean, default: false },
 });
 

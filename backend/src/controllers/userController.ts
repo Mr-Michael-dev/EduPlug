@@ -3,6 +3,7 @@
 
 import { Request, Response, NextFunction } from 'express'; 
 import { User } from '../models/User.js';
+import { fileUploader } from '../utils/upload.js';
 
 // Get user profile
 export const getProfile = async (req: Request, res: Response): Promise<Response> => {
@@ -11,7 +12,19 @@ export const getProfile = async (req: Request, res: Response): Promise<Response>
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
-      return res.json(user);
+
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const profilePicUrl = user.profilePic ? `${baseUrl}${user.profilePic}` : null;
+
+      return res.json({
+        _id: user._id,
+        fullname: user.fullname,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        profilePic: profilePicUrl,  // Full URL for the profile picture
+        isVerified: user.isVerified
+      });
     } catch (error) {
       if (error instanceof Error) {
         return res.status(500).json({ error: 'Server error' });
@@ -22,7 +35,7 @@ export const getProfile = async (req: Request, res: Response): Promise<Response>
   };
   
   // Update user profile
-  export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
+export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
     try {
       const user = await User.findByIdAndUpdate(req.user?._id, req.body, { new: true });
       if (!user) {
@@ -37,4 +50,29 @@ export const getProfile = async (req: Request, res: Response): Promise<Response>
       }
     }
   };
+
+// upload profile picture
+const uploadProfilePic = fileUploader('./uploads/profile-pics').single('profilePic');
+
+export const updateProfilePic = async (req: Request, res: Response): Promise<void> => {
+      uploadProfilePic(req, res, async (err) => {
+        if (err) {
+          return res.status(400).json({ error: err.message });
+        }
   
+        try {
+          const user = await User.findById(req.user?._id);
+          if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+          }
+  
+          // Save the profile picture
+          user.profilePic = `/uploads/profile-pics/${req.file?.filename}`;
+          await user.save();
+  
+          return res.json(user);
+        } catch (error) {
+          return res.status(500).json({ error: 'Server error' });
+        }
+      });
+  };
