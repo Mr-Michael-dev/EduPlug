@@ -6,6 +6,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import swaggerDocs from './swagger.js';
+import path from 'path';
 import commentRouter from './routes/commentRoutes.js';
 import postRouter from './routes/postRoutes.js';
 import userRouter from './routes/userRoutes.js';
@@ -17,13 +18,14 @@ app.use(cors({ credentials: true }));
 app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
+// Middleware to handle static file (photo)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Middleware and routes setup
 app.use('/api/v1/comments', commentRouter);
 app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/notifications', notificationRouter);
-// Middleware and routes setup
 app.use(express.json());
-// app.use('/api', router);
 // Swagger Documentation
 swaggerDocs(app);
 const PORT = process.env.PORT || 5000;

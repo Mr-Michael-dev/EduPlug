@@ -33,8 +33,31 @@ export const getProfile = async (req: Request, res: Response): Promise<Response>
       }
     }
   };
+
+export const deleteProfile = async (req: Request, res: Response): Promise<Response> => {
+    // confirm user role if admin
+    if (req.user?.role !== 'admin') {
+        return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    const userId = req.params.id;
+    try {
+          const user = await User.findByIdAndDelete(userId);
+          if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+          }
+          return res.json({ message: 'User deleted successfully' });
+        } catch (error) {
+            console.error('Error deleting user:', error)
+          if (error instanceof Error) {
+            return res.status(500).json({ error: 'Server error' });
+          } else {
+            return res.status(500).json({ error: 'Unknown error occurred' });
+          }
+        }
+      };
   
-  // Update user profile
+// Update user profile
 export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
     try {
       const user = await User.findByIdAndUpdate(req.user?._id, req.body, { new: true });

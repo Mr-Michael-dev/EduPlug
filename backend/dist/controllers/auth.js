@@ -1,26 +1,9 @@
 /// <reference types="express" />
 /// <reference path="../types/express/express.d.ts" />
 import { User } from '../models/User.js';
-import { generateToken, hashPassword, random } from '../helpers/index.js';
+import { generateToken, hashPassword, random } from '../utils/index.js';
 import redisClient from '../db/redis.js'; // Redis redisClient
 import nodemailer from 'nodemailer'; // For sending verification emails
-import jwt from 'jsonwebtoken';
-// Middleware for protecting routes
-export const protect = async (req, res, next) => {
-    let token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-        res.status(401).json({ error: 'Not authorized' });
-        return;
-    }
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'CLETA-REST-API');
-        req.user = await User.findById(decoded.id).select('-password');
-        next();
-    }
-    catch (error) {
-        res.status(401).json({ error: 'Not authorized, token failed' });
-    }
-};
 // Register a new user
 export const register = async (req, res) => {
     const { fullname, username, email, password, role } = req.body;
@@ -122,42 +105,6 @@ export const login = async (req, res) => {
     catch (error) {
         if (error instanceof Error) {
             return res.status(500).json({ error: error.message });
-        }
-        else {
-            return res.status(500).json({ error: 'Unknown error occurred' });
-        }
-    }
-};
-// Get user profile
-export const getProfile = async (req, res) => {
-    try {
-        const user = await User.findById(req.user?._id);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        return res.json(user);
-    }
-    catch (error) {
-        if (error instanceof Error) {
-            return res.status(500).json({ error: 'Server error' });
-        }
-        else {
-            return res.status(500).json({ error: 'Unknown error occurred' });
-        }
-    }
-};
-// Update user profile
-export const updateProfile = async (req, res) => {
-    try {
-        const user = await User.findByIdAndUpdate(req.user?._id, req.body, { new: true });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        return res.json(user);
-    }
-    catch (error) {
-        if (error instanceof Error) {
-            return res.status(500).json({ error: 'Server error' });
         }
         else {
             return res.status(500).json({ error: 'Unknown error occurred' });

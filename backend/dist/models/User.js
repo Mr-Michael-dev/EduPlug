@@ -6,6 +6,7 @@ const userSchema = new Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['admin', 'contributor', 'visitor'], default: 'visitor' },
+    profilePic: { type: String, default: '' },
     isVerified: { type: Boolean, default: false },
 });
 userSchema.methods.matchPassword = async function (password) {
