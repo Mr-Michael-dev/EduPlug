@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { Comment } from '../models/Comment';
-import { Post } from '../models/Post';
+import { Comment } from '../models/Comment.js';
+import { Post } from '../models/Post.js';
 
 export const addComment = async (req: Request, res: Response): Promise<void> => {
   try {

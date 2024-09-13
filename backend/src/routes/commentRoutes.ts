@@ -4,8 +4,8 @@ import {
   getComments,
   updateComment,
   deleteComment,
-} from '../controllers/commentController';
-import { protect } from '../middleware/auth'; // Changed to use middleware for authentication
+} from '../controllers/commentController.js';
+import { protect } from '../middleware/auth.js'; // Changed to use middleware for authentication
 
 const router = Router();
 

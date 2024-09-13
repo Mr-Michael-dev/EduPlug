@@ -1,14 +1,14 @@
 import request from 'supertest';
 import { expect } from 'chai';
-import app from '../index'; // Ensure the app is properly exported
-import redisClient from '../db/redis'; // Redis redisClient
+import app from '../index.js'; // Ensure the app is properly exported
+import redisClient from '../db/redis.js'; // Redis redisClient
 
 describe('Comprehensive API Tests', () => {
 
   // Test User Registration and Login
   describe('Authentication Tests', () => {
     it('should register a user', async () => {
-      const res = await request(app).post('/api/users/register').send({
+      const res = await request(app).post('/api/v1/users/register').send({
         fullname: 'Test User',
         username: 'testuser',
         email: 'test@example.com',
@@ -19,7 +19,7 @@ describe('Comprehensive API Tests', () => {
     });
 
     it('should login a user', async () => {
-      const res = await request(app).post('/api/users/login').send({
+      const res = await request(app).post('/api/v1/users/login').send({
         email: 'test@example.com',
         password: 'password123',
       });
@@ -35,7 +35,7 @@ describe('Comprehensive API Tests', () => {
     // Test User Registration and Login
     describe('Authentication Tests', () => {
       it('should register a user', async () => {
-        const res = await request(app).post('/api/users/register').send({
+        const res = await request(app).post('/api/v1/users/register').send({
           fullname: 'Test User',
           username: 'testuser',
           email: 'test@example.com',
@@ -46,7 +46,7 @@ describe('Comprehensive API Tests', () => {
       });
   
       it('should login a user', async () => {
-        const res = await request(app).post('/api/users/login').send({
+        const res = await request(app).post('/api/v1/users/login').send({
           email: 'test@example.com',
           password: 'password123',
         });
@@ -62,7 +62,7 @@ describe('Comprehensive API Tests', () => {
   
       before(async () => {
         // Login to get token
-        const login = await request(app).post('/api/users/login').send({
+        const login = await request(app).post('/api/v1/users/login').send({
           email: 'test@example.com',
           password: 'password123',
         });
@@ -71,7 +71,7 @@ describe('Comprehensive API Tests', () => {
   
       it('should create a post', async () => {
         const res = await request(app)
-          .post('/api/posts')
+          .post('/api/v1/posts')
           .set('Authorization', `Bearer ${token}`)
           .send({
             title: 'New Post',
@@ -83,14 +83,14 @@ describe('Comprehensive API Tests', () => {
       });
   
       it('should read a post', async () => {
-        const res = await request(app).get(`/api/posts/${postId}`);
+        const res = await request(app).get(`/api/v1/posts/${postId}`);
         expect(res.status).to.equal(200);
         expect(res.body).to.have.property('_id', postId);
       });
   
       it('should update a post', async () => {
         const res = await request(app)
-          .put(`/api/posts/${postId}`)
+          .put(`/api/v1/posts/${postId}`)
           .set('Authorization', `Bearer ${token}`)
           .send({ title: 'Updated Post' });
         expect(res.status).to.equal(200);
@@ -99,7 +99,7 @@ describe('Comprehensive API Tests', () => {
   
       it('should delete a post', async () => {
         const res = await request(app)
-          .delete(`/api/posts/${postId}`)
+          .delete(`/api/v1/posts/${postId}`)
           .set('Authorization', `Bearer ${token}`);
         expect(res.status).to.equal(200);
       });
@@ -108,7 +108,7 @@ describe('Comprehensive API Tests', () => {
     // Test Form Validation (e.g., empty fields or invalid inputs)
     describe('Form Validation Tests', () => {
       it('should return validation error for empty fields', async () => {
-        const res = await request(app).post('/api/users/register').send({
+        const res = await request(app).post('/api/v1/users/register').send({
           fullname: '',
           username: '',
           email: 'invalidemail',
@@ -122,7 +122,7 @@ describe('Comprehensive API Tests', () => {
     // Test Database Interaction
     describe('Database Interaction Tests', () => {
       it('should interact with the database and retrieve users', async () => {
-        const res = await request(app).get('/api/users');
+        const res = await request(app).get('/api/v1/users');
         expect(res.status).to.equal(200);
         expect(res.body).to.be.an('array');
       });
@@ -132,15 +132,15 @@ describe('Comprehensive API Tests', () => {
     describe('Redis Cache Tests', () => {
       it('should cache and retrieve data from Redis', async () => {
         // First request (not cached)
-        let res = await request(app).get('/api/posts');
+        let res = await request(app).get('/api/v1/posts');
         expect(res.status).to.equal(200);
   
         // Manually check Redis cache
-        const cacheData = await redisClient.get('/api/posts');
+        const cacheData = await redisClient.get('/api/v1/posts');
         expect(cacheData).to.not.be.null;
   
         // Second request (should retrieve from cache)
-        res = await request(app).get('/api/posts');
+        res = await request(app).get('/api/v1/posts');
         expect(res.status).to.equal(200);
       });
     });
@@ -148,12 +148,12 @@ describe('Comprehensive API Tests', () => {
     // Test Error Handling
     describe('Error Handling Tests', () => {
       it('should return 404 for non-existent routes', async () => {
-        const res = await request(app).get('/api/non-existent-route');
+        const res = await request(app).get('/api/v1/non-existent-route');
         expect(res.status).to.equal(404);
       });
   
       it('should handle database errors gracefully', async () => {
-        const res = await request(app).get('/api/posts/invalid-id');
+        const res = await request(app).get('/api/v1/posts/invalid-id');
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
       });
@@ -162,7 +162,7 @@ describe('Comprehensive API Tests', () => {
     // Test Security Vulnerabilities (e.g., SQL/NoSQL injection)
     describe('Security Tests', () => {
       it('should prevent NoSQL injection', async () => {
-        const res = await request(app).post('/api/users/login').send({
+        const res = await request(app).post('/api/v1/users/login').send({
           email: { $gt: '' },  // NoSQL injection attempt
           password: 'password123',
         });
@@ -177,7 +177,7 @@ describe('Comprehensive API Tests', () => {
   
         const requests = [];
         for (let i = 0; i < 50; i++) {
-          requests.push(request(app).get('/api/posts'));
+          requests.push(request(app).get('/api/v1/posts'));
         }
   
         const responses = await Promise.all(requests);
@@ -190,7 +190,7 @@ describe('Comprehensive API Tests', () => {
     // Test UI Rendering (Basic API response checks)
     describe('UI Rendering Tests', () => {
       it('should render correct response for /posts', async () => {
-        const res = await request(app).get('/api/posts');
+        const res = await request(app).get('/api/v1/posts');
         expect(res.status).to.equal(200);
         expect(res.body).to.be.an('array');
       });
@@ -202,7 +202,7 @@ describe('Comprehensive API Tests', () => {
         this.timeout(3000); // Set a time threshold for responsiveness
   
         const start = Date.now();
-        const res = await request(app).get('/api/posts');
+        const res = await request(app).get('/api/v1/posts');
         const end = Date.now();
         expect(res.status).to.equal(200);
         expect(end - start).to.be.lessThan(1000);  // Ensure response time is under 1 second

@@ -1,24 +1,21 @@
-// const request = require('supertest');
-import app from '../../dist/index'; // Adjust path as needed
+import app from '../index.js'; // Adjust path as needed
+import request from 'supertest';
 
-// describe('GET /api/users', () => {
+// describe('GET /api/v1/users', () => {
 //   it('should return a list of users', async () => {
-//     const response = await request(app).get('/api/users');
+//     const response = await request(app).get('/api/v1/users');
 //     expect(response.status).toBe(200);
 //     expect(response.body).toBeInstanceOf(Array);
 //   });
 // });
 
 
-const request = require('supertest');
-
-
-describe('GET /api/users', function() {
+describe('GET /api/v1/users', function() {
   it('should return a list of users', function(done) {
     request(app)
-      .get('/api/users')
+      .get('/api/v1/users')
       .expect(200)
-      .end(function(err, res) {
+      .end(function(err: any, res: any) {
         if (err) return done(err);
         // Add assertions here
         done();

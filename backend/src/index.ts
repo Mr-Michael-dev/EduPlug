@@ -6,12 +6,12 @@ import compression from 'compression';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import swaggerDocs from './swagger';
+import swaggerDocs from './swagger.js';
 
-import commentRouter from './routes/commentRoutes';
-import postRouter from './routes/postRoutes';
-import userRouter from './routes/userRoutes';
-import notificationRouter from './routes/notificationRoutes';
+import commentRouter from './routes/commentRoutes.js';
+import postRouter from './routes/postRoutes.js';
+import userRouter from './routes/userRoutes.js';
+import notificationRouter from './routes/notificationRoutes.js';
 
 dotenv.config();
 

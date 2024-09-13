@@ -1,6 +1,7 @@
 {
   "name": "eduplug-backend",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "type": "module",
   "description": "Backend API for EduPlug",
   "main": "src/index.ts",
   "scripts": {
@@ -8,7 +9,7 @@
     "build": "tsc",
     "serve": "nodemon dist/index.js",
     "lint": "eslint",
-    "test": "mocha 'src/test/**/*.js'",
+    "test": "mocha 'dist/tests/*.js'",
     "dev": "nodemon --exec babel-node --presets babel-preset-env src/server.ts",
     "unittest": "./node_modules/mocha/bin/mocha --require babel-register --exit"
   },
