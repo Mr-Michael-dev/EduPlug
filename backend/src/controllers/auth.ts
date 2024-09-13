@@ -3,7 +3,7 @@
 
 import { Request, Response, NextFunction } from 'express'; 
 import { User } from '../models/User.js';
-import { generateToken, hashPassword, random } from '../helpers/index.js';
+import { generateToken, hashPassword, random } from '../utils/index.js';
 import redisClient from '../db/redis.js'; // Redis redisClient
 import nodemailer from 'nodemailer'; // For sending verification emails
 import jwt from 'jsonwebtoken';
