@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
 // middleware for protecting routes
 export const protect = async (req, res, next) => {
-    let token = req.headers.authorization?.split(' ')[1];
+    const token = req.cookies.token; // get token from cookies
     if (!token) {
         res.status(401).json({ error: 'Not authorized' });
         return;

@@ -101,9 +101,9 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'Invalid login credentials' });
     }
 
     if (!user.isVerified) {
@@ -112,11 +112,20 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid login credentials' });
     }
 
     const token = generateToken(user._id, user.role);
-    return res.status(200).json({ token, user });
+
+    // Send JWT in an HTTP-only cookie
+    res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // true in production for HTTPS
+    sameSite: 'strict', // prevent CSRF
+    maxAge: 60 * 60 * 1000, // 1 hour
+    });
+
+    return res.status(200).json({ message: 'Login successful' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ error: error.message });
@@ -124,4 +133,15 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       return res.status(500).json({ error: 'Unknown error occurred' });
     }
   }
+};
+
+// logout controller
+export const logout = async (req: Request, res: Response): Promise<Response> => {
+  res.clearCookie('token'); // Clear the token cookie
+  return res.status(200).send({ message: 'Logged out successfully' });
+};
+
+// check authentication for users
+export const checkAuth = async (req: Request, res: Response): Promise<Response> => {
+  return res.status(200).json({ message: 'Authenticated', user: req.user });
 };
