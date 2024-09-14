@@ -8,7 +8,6 @@ function Footer() {
       <div className="footer-content">
         {/* Left Section */}
         <div className="footer-section left">
-          <h4>ABOUT US</h4>
           <ul>
             <li><Link to="/about-us">About Us</Link></li>
             <li><Link to="/our-mission">Our Mission</Link></li>
