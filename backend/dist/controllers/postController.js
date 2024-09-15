@@ -1,19 +1,31 @@
 import { Post } from '../models/Post.js';
+import { fileUploader } from '../utils/upload.js';
+const uploadPostBanner = fileUploader('./uploads/post-banners').single('banner');
 // Create post for contributors
 export const createPost = async (req, res) => {
-    if (req.user?.role !== 'contributor') {
-        res.status(403).json({ error: 'Only contributors can create posts' });
-        return; // Return here after sending the response
-    }
-    const { title, content } = req.body;
-    try {
-        const post = new Post({ title, content, author: req.user._id });
-        await post.save();
-        res.status(201).json(post);
-    }
-    catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+    uploadPostBanner(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ error: err.message });
+        }
+        // Fixed the condition for checking user role
+        if (req.user?.role !== 'contributor' && req.user?.role !== 'admin') {
+            return res.status(403).json({ error: 'Only contributors or admins can create posts' });
+        }
+        const { title, content } = req.body;
+        try {
+            const post = new Post({
+                title,
+                content,
+                banner: `/uploads/post-banners/${req.file?.filename}`,
+                author: req.user._id
+            });
+            await post.save();
+            return res.status(201).json(post);
+        }
+        catch (error) {
+            return res.status(400).json({ error: error.message });
+        }
+    });
 };
 // Delete post (Admins or post authors can delete)
 export const deletePost = async (req, res) => {
@@ -31,12 +43,22 @@ export const deletePost = async (req, res) => {
 };
 export const getPostById = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).populate('author', 'username');
+        const post = await Post.findById(req.params.id)
+            .populate('author', 'username')
+            .populate('comments');
         if (!post) {
             res.status(404).json({ error: 'Post not found' });
             return;
         }
-        res.json(post);
+        // Generate the base URL for the banner image
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        // Construct the full URL for the banner image if it exists
+        const bannerUrl = post.banner ? `${baseUrl}/${post.banner}` : null;
+        // Return the post with the full banner URL
+        res.json({
+            ...post.toObject(),
+            banner: bannerUrl // Full URL for the banner image
+        });
     }
     catch (error) {
         res.status(400).json({ error: error.message });
@@ -54,7 +76,7 @@ export const updatePost = async (req, res) => {
             return;
         }
         post.title = req.body.title || post.title;
-        post.body = req.body.body || post.body;
+        post.content = req.body.content || post.content;
         post.tags = req.body.tags || post.tags;
         await post.save();
         res.json(post);
@@ -65,8 +87,22 @@ export const updatePost = async (req, res) => {
 };
 // Visitors can view posts
 export const getPosts = async (req, res) => {
-    const posts = await Post.find().populate('author', 'username').populate('comments');
-    res.status(200).json(posts);
+    try {
+        const posts = await Post.find()
+            .populate('author', 'username')
+            .populate('comments');
+        // Generate the base URL for the banner images
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        // Map through posts to construct the full URL for each banner image
+        const postsWithFullBannerUrls = posts.map(post => ({
+            ...post.toObject(),
+            banner: post.banner ? `${baseUrl}/${post.banner}` : null
+        }));
+        res.status(200).json(postsWithFullBannerUrls);
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 };
 export const likePost = async (req, res) => {
     try {

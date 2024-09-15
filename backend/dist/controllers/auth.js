@@ -1,26 +1,9 @@
 /// <reference types="express" />
 /// <reference path="../../express.d.ts" />
 import { User } from '../models/User.js';
-import { generateToken, hashPassword, random } from '../helpers/index.js';
+import { generateToken, hashPassword, random } from '../utils/index.js';
 import redisClient from '../db/redis.js'; // Redis redisClient
 import nodemailer from 'nodemailer'; // For sending verification emails
-import jwt from 'jsonwebtoken';
-// Middleware for protecting routes
-export const protect = async (req, res, next) => {
-    let token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-        res.status(401).json({ error: 'Not authorized' });
-        return;
-    }
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'CLETA-REST-API');
-        req.user = await User.findById(decoded.id).select('-password');
-        next();
-    }
-    catch (error) {
-        res.status(401).json({ error: 'Not authorized, token failed' });
-    }
-};
 // Register a new user
 export const register = async (req, res) => {
     const { fullname, username, email, password, role } = req.body;
@@ -105,19 +88,26 @@ export const verifyEmail = async (req, res) => {
 export const login = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).select('+password');
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'Invalid login credentials' });
         }
         if (!user.isVerified) {
             return res.status(403).json({ error: 'Please verify your email' });
         }
         const isMatch = await user.matchPassword(password);
         if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid login credentials' });
         }
         const token = generateToken(user._id, user.role);
-        return res.status(200).json({ token, user });
+        // Send JWT in an HTTP-only cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 1000, // 1 hour
+        });
+        return res.status(200).json({ message: 'Login successful' });
     }
     catch (error) {
         if (error instanceof Error) {
@@ -128,39 +118,12 @@ export const login = async (req, res) => {
         }
     }
 };
-// Get user profile
-export const getProfile = async (req, res) => {
-    try {
-        const user = await User.findById(req.user?._id);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        return res.json(user);
-    }
-    catch (error) {
-        if (error instanceof Error) {
-            return res.status(500).json({ error: 'Server error' });
-        }
-        else {
-            return res.status(500).json({ error: 'Unknown error occurred' });
-        }
-    }
+// logout controller
+export const logout = async (req, res) => {
+    res.clearCookie('token'); // Clear the token cookie
+    return res.status(200).send({ message: 'Logged out successfully' });
 };
-// Update user profile
-export const updateProfile = async (req, res) => {
-    try {
-        const user = await User.findByIdAndUpdate(req.user?._id, req.body, { new: true });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        return res.json(user);
-    }
-    catch (error) {
-        if (error instanceof Error) {
-            return res.status(500).json({ error: 'Server error' });
-        }
-        else {
-            return res.status(500).json({ error: 'Unknown error occurred' });
-        }
-    }
+// check authentication for users
+export const checkAuth = async (req, res) => {
+    return res.status(200).json({ message: 'Authenticated', user: req.user });
 };
