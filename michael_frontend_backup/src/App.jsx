@@ -1,20 +1,18 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './home';
-import Login from './login';
-// import Register from './Register';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Ensure Router is imported
+import Header from './components/header/Header';
+import Footer from './components/footer/Footer';
 import './App.css'
-// ... other components
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        {/* <Route path="/register" element={<Register />} /> */}
-        {/* ... other routes */}
-      </Routes>
+    <Router> {/* Wrap the app in Router */}
+      <>
+        <Header />
+        {/* Add your Routes here if needed */}
+        <Footer />
+      </>
     </Router>
   );
 }
