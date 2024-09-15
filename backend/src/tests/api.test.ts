@@ -1,6 +1,5 @@
-<<<<<<< HEAD:backend/src/test/api.test.ts
 import request from 'supertest';
-import app from '../index';
+import app from '../index.js';
 import { expect } from 'chai';
 import { client } from '../models/cache';
 // const request = require('request');
@@ -22,9 +21,9 @@ describe('User API Tests', () => {
     expect(res.status).to.equal(404);
   });
 });
-=======
-import app from '../index.js'; // Adjust path as needed
-import request from 'supertest';
+
+// import app from '../index.js'; // Adjust path as needed
+// import request from 'supertest';
 
 // describe('GET /api/v1/users', () => {
 //   it('should return a list of users', async () => {
@@ -47,4 +46,3 @@ describe('GET /api/v1/users', function() {
       });
   });
 });
->>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f:backend/src/tests/api.test.ts

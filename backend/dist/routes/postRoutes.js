@@ -14,11 +14,5 @@ router.route('/:id')
     .delete(protect, deletePost); // Protect route for deleting posts
 // Route for liking a post
 router.route('/:id/like')
-<<<<<<< HEAD
-    .post(auth_1.protect, postController_1.likePost); // Protect route for liking posts
-exports.default = router;
-//# sourceMappingURL=postRoutes.js.map
-=======
     .post(protect, likePost); // Protect route for liking posts
 export default router;
->>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f

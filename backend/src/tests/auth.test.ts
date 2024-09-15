@@ -1,8 +1,8 @@
 import request from 'supertest';
-import app from '../index';
+import app from '../index.js';
 import { expect } from 'chai';
-<<<<<<< HEAD:backend/src/test/auth.test.ts
 import { client } from '../models/cache';
+import redisClient from '../db/redis.js';
 // const request = require('request');
 // const app = require('../index'); // Ensure the path is correct
 // const { client } = require('../models/cache'); // Redis client
@@ -11,11 +11,6 @@ import { client } from '../models/cache';
 
 // describe('API integration test', () => {
 //   const app = 'http://localhost:7865';
-=======
-import app from '../index.js'; // Ensure the app is properly exported
-import redisClient from '../db/redis.js'; // Redis redisClient
->>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f:backend/src/tests/auth.test.ts
-
 describe('Comprehensive API Tests', () => {
 
   describe('Authentication Tests', () => {
@@ -52,7 +47,6 @@ describe('Comprehensive API Tests', () => {
       token = login.body.token;
     });
 
-<<<<<<< HEAD:backend/src/test/auth.test.ts
     it('should create a post', async () => {
       const res = await request(app)
         .post('/api/v1/posts')
@@ -96,7 +90,6 @@ describe('Comprehensive API Tests', () => {
         username: '',
         email: 'invalidemail',
         password: '',
-=======
     // Test User Registration and Login
     describe('Authentication Tests', () => {
       it('should register a user', async () => {
@@ -207,12 +200,10 @@ describe('Comprehensive API Tests', () => {
         // Second request (should retrieve from cache)
         res = await request(app).get('/api/v1/posts');
         expect(res.status).to.equal(200);
->>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f:backend/src/tests/auth.test.ts
       });
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property('error');
     });
-<<<<<<< HEAD:backend/src/test/auth.test.ts
   });
 
   describe('Redis Cache Tests', () => {
@@ -233,8 +224,6 @@ describe('Comprehensive API Tests', () => {
       const res = await request(app).post('/api/v1/users/login').send({
         email: { $gt: '' },  // NoSQL injection attempt
         password: 'password123',
-=======
-  
     // Test Error Handling
     describe('Error Handling Tests', () => {
       it('should return 404 for non-existent routes', async () => {
@@ -257,11 +246,9 @@ describe('Comprehensive API Tests', () => {
           password: 'password123',
         });
         expect(res.status).to.equal(401);
->>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f:backend/src/tests/auth.test.ts
       });
       expect(res.status).to.equal(401);
     });
-<<<<<<< HEAD:backend/src/test/auth.test.ts
   });
 
   describe('Error Handling Tests', () => {
@@ -269,7 +256,6 @@ describe('Comprehensive API Tests', () => {
       const res = await request(app).get('/api/v1/posts/invalid-id');
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property('error');
-=======
   
     // Test API Performance (Under Load)
     describe('API Performance Tests', () => {
@@ -308,7 +294,6 @@ describe('Comprehensive API Tests', () => {
         expect(res.status).to.equal(200);
         expect(end - start).to.be.lessThan(1000);  // Ensure response time is under 1 second
       });
->>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f:backend/src/tests/auth.test.ts
     });
   });
 });

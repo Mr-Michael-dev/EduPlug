@@ -14,9 +14,4 @@ router.get('/', (req, res) => {
         .put(protect, updateComment) // Protect route for updating comments
         .delete(protect, deleteComment); // Protect route for deleting comments
 });
-<<<<<<< HEAD
-exports.default = router;
-//# sourceMappingURL=commentRoutes.js.map
-=======
 export default router;
->>>>>>> 93d26dc3dc7f5ad4d3ee5dab137a30d445ae819f
