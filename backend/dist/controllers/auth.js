@@ -103,8 +103,8 @@ export const login = async (req, res) => {
         // Send JWT in an HTTP-only cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production', // true in production for HTTPS
+            sameSite: 'strict', // prevent CSRF
             maxAge: 60 * 60 * 1000, // 1 hour
         });
         return res.status(200).json({ message: 'Login successful' });
