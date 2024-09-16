@@ -9,6 +9,11 @@ import Profile from './components/User/Profile';
 import PostUpload from './components/User/PostUpload';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
+import AdminDashboard from './components/admin/AdminDashboard';
+import Profile from './components/user/Profile';
+import PostUpload from './components/user/PostUpload';
+import Login from './components/auth/Login';
+import SignUp from './components/auth/SignUp';
 import './App.css';
 
 function App() {
@@ -20,6 +25,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/upload" element={<PostUpload />} />
           <Route path="/admin" element={<AdminDashboard />} />

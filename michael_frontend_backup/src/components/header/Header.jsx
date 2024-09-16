@@ -40,6 +40,7 @@ function Header() {
           </Nav>
           <Button variant="outline-info" className="mx-2" onClick={() => navigate('/login')}>Login</Button>
           <Button variant="info" onClick={() => navigate('/register')}>Register</Button>
+          <Button variant="info" onClick={() => navigate('/signup')}>Sign Up</Button>
         </Navbar.Collapse>
       </Container>
     </Navbar>
