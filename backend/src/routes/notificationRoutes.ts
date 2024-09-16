@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { protect } from '../middleware/auth'; // Changed to middleware path
+import { protect } from '../middleware/auth.js'; // Changed to middleware path
 import {
   getNotifications,
   markAsRead,
   deleteNotification,
-} from '../controllers/notificationController';
+} from '../controllers/notificationController.js';
 
 const router = Router();
 

@@ -1,20 +1,8 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteComment = exports.updateComment = exports.getComments = exports.addComment = void 0;
-const Comment_1 = require("../models/Comment");
-const Post_1 = require("../models/Post");
-const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+import { Comment } from '../models/Comment.js';
+import { Post } from '../models/Post.js';
+export const addComment = async (req, res) => {
     try {
-        const post = yield Post_1.Post.findById(req.params.id);
+        const post = await Post.findById(req.params.id);
         if (!post) {
             res.status(404).json({ error: 'Post not found' });
             return;
@@ -23,14 +11,14 @@ const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             res.status(401).json({ error: 'Not authorized' });
             return;
         }
-        const comment = new Comment_1.Comment({
+        const comment = new Comment({
             body: req.body.body,
             author: req.user._id,
             post: post._id,
         });
-        yield comment.save();
+        await comment.save();
         post.comments.push(comment._id);
-        yield post.save();
+        await post.save();
         res.status(201).json(comment);
     }
     catch (error) {
@@ -41,12 +29,11 @@ const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             res.status(400).json({ error: 'An unknown error occurred' });
         }
     }
-});
-exports.addComment = addComment;
+};
 // Get comments for a post
-const getComments = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const getComments = async (req, res) => {
     try {
-        const comments = yield Comment_1.Comment.find({ post: req.params.id }).populate('author', 'username');
+        const comments = await Comment.find({ post: req.params.id }).populate('author', 'username');
         res.json(comments);
     }
     catch (error) {
@@ -57,12 +44,11 @@ const getComments = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             res.status(400).json({ error: 'An unknown error occurred' });
         }
     }
-});
-exports.getComments = getComments;
+};
 // Update a comment
-const updateComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const updateComment = async (req, res) => {
     try {
-        const comment = yield Comment_1.Comment.findById(req.params.id);
+        const comment = await Comment.findById(req.params.id);
         if (!comment) {
             res.status(404).json({ error: 'Comment not found' });
             return;
@@ -72,7 +58,7 @@ const updateComment = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return;
         }
         comment.body = req.body.body || comment.body;
-        yield comment.save();
+        await comment.save();
         res.json(comment);
     }
     catch (error) {
@@ -83,12 +69,11 @@ const updateComment = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             res.status(400).json({ error: 'An unknown error occurred' });
         }
     }
-});
-exports.updateComment = updateComment;
+};
 // Delete a comment
-const deleteComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const deleteComment = async (req, res) => {
     try {
-        const comment = yield Comment_1.Comment.findById(req.params.id);
+        const comment = await Comment.findById(req.params.id);
         if (!comment) {
             res.status(404).json({ error: 'Comment not found' });
             return;
@@ -97,7 +82,7 @@ const deleteComment = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             res.status(401).json({ error: 'Unauthorized' });
             return;
         }
-        yield comment.deleteOne();
+        await comment.deleteOne();
         res.json({ message: 'Comment removed' });
     }
     catch (error) {
@@ -108,5 +93,4 @@ const deleteComment = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             res.status(400).json({ error: 'An unknown error occurred' });
         }
     }
-});
-exports.deleteComment = deleteComment;
+};
