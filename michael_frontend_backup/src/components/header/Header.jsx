@@ -5,9 +5,11 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
-import eduplug_logo_1_copy from "../../assets/eduplug_logo_1_copy.png"
+import eduplug_logo_1_copy from "../../assets/eduplug_logo_1_copy.png";
+import { useNavigate } from 'react-router-dom';
 
 function Header() {
+  const navigate = useNavigate(); 
   return (
     <Navbar  expand="lg" className="bg-dark navbar-dark" sticky="top">
       <Container>
@@ -24,7 +26,7 @@ function Header() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
+            <Nav.Link href="/">Home</Nav.Link>
             <Nav.Link href="#blogs">Blogs</Nav.Link>
             <Nav.Link href="#about">About</Nav.Link>
             <Nav.Link href="#contacts">Contacts</Nav.Link>
@@ -36,8 +38,8 @@ function Header() {
               <NavDropdown.Item href="#action/3.3">Coming soon</NavDropdown.Item>
             </NavDropdown>
           </Nav>
-          <Button variant="outline-info" className="mx-2">Login</Button>
-          <Button variant="info">Register</Button>
+          <Button variant="outline-info" className="mx-2" onClick={() => navigate('/login')}>Login</Button>
+          <Button variant="info" onClick={() => navigate('/register')}>Register</Button>
         </Navbar.Collapse>
       </Container>
     </Navbar>

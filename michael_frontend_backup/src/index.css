@@ -32,3 +32,36 @@ body {
     background-color: #f9f9f9;
   }
 }
+
+
+
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+.login-page, .register-page, .profile-page, .post-upload-page, .admin-dashboard {
+  padding: 20px;
+}
+
+input, textarea {
+  display: block;
+  margin: 10px 0;
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
