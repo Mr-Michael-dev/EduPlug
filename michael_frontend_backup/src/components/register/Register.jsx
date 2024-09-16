@@ -49,7 +49,7 @@ function SignUp() {
         setErrors({});
         setApiError(null);
 
-        const response = await axios.post('please add the backend url here', {
+        const response = await axios.post('http://localhost:5000/api/signup', {
           firstName,
           lastName,
           email,
