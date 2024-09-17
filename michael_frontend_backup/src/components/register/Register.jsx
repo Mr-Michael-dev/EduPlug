@@ -59,7 +59,7 @@ function SignUp() {
         if (response.status === 201) {
           setAccountCreated(true);
           setTimeout(() => {
-            navigate('/blog');
+            navigate('/home');
           }, 2000);
         }
       } catch (error) {
