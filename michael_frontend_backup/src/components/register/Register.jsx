@@ -12,6 +12,7 @@ function SignUp() {
   const [errors, setErrors] = useState({});
   const [accountCreated, setAccountCreated] = useState(false);
   const [apiError, setApiError] = useState(null);
+  const [emailSent, setEmailSent] = useState(false);
 
   const validateForm = () => {
     let formErrors = {};
@@ -21,7 +22,7 @@ function SignUp() {
     }
     
     if (!userName.trim()) {
-      formErrors.lastName = "Username is required.";
+      formErrors.userName = "Username is required.";
     }
 
     if (!email.trim()) {
@@ -58,9 +59,7 @@ function SignUp() {
 
         if (response.status === 201) {
           setAccountCreated(true);
-          setTimeout(() => {
-            navigate('/home');
-          }, 2000);
+          setEmailSent(true);  // Indicates email verification was sent
         }
       } catch (error) {
         if (error.response && error.response.data.message) {
@@ -74,12 +73,17 @@ function SignUp() {
 
   return (
     <Container className="signup-container mt-5">
-      {/* Header */}
       <h1 className="text-center">Sign Up</h1>
 
       {accountCreated && (
         <Alert variant="success">
-          Account created successfully! Redirecting to home page...
+          Account created successfully! Please check your email to verify your account.
+        </Alert>
+      )}
+
+      {emailSent && (
+        <Alert variant="info">
+          A verification email has been sent to {email}. Please follow the instructions to complete your registration.
         </Alert>
       )}
 
@@ -158,4 +162,5 @@ function SignUp() {
 }
 
 export default SignUp;
+
 
