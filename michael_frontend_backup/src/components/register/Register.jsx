@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 
 function SignUp() {
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -16,12 +16,12 @@ function SignUp() {
   const validateForm = () => {
     let formErrors = {};
 
-    if (!firstName.trim()) {
-      formErrors.firstName = "First Name is required.";
+    if (!fullName.trim()) {
+      formErrors.fullName = "Full Name is required.";
     }
     
-    if (!lastName.trim()) {
-      formErrors.lastName = "Last Name is required.";
+    if (!userName.trim()) {
+      formErrors.lastName = "Username is required.";
     }
 
     if (!email.trim()) {
@@ -50,8 +50,8 @@ function SignUp() {
         setApiError(null);
 
         const response = await axios.post('http://localhost:5000/api/signup', {
-          firstName,
-          lastName,
+          fullName,
+          userName,
           email,
           password,
         });
@@ -79,7 +79,7 @@ function SignUp() {
 
       {accountCreated && (
         <Alert variant="success">
-          Account created successfully! Redirecting to blog page...
+          Account created successfully! Redirecting to home page...
         </Alert>
       )}
 
@@ -90,29 +90,29 @@ function SignUp() {
       )}
 
       <Form>
-        <Form.Group className="mb-3" controlId="formFirstName">
+        <Form.Group className="mb-3" controlId="formFullName">
           <Form.Control
             type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            isInvalid={!!errors.firstName}
+            placeholder="Full Name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            isInvalid={!!errors.fullName}
           />
           <Form.Control.Feedback type="invalid">
-            {errors.firstName}
+            {errors.fullName}
           </Form.Control.Feedback>
         </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formLastName">
+        <Form.Group className="mb-3" controlId="formUserName">
           <Form.Control
             type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            isInvalid={!!errors.lastName}
+            placeholder="User Name"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            isInvalid={!!errors.userName}
           />
           <Form.Control.Feedback type="invalid">
-            {errors.lastName}
+            {errors.userName}
           </Form.Control.Feedback>
         </Form.Group>
 
