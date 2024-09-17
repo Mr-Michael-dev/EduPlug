@@ -7,7 +7,7 @@ function EmailVerification() {
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState(null);
   const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useNavigate();n
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get('token');
 
