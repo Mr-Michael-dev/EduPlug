@@ -7,8 +7,7 @@ import Home from './components/home/Home';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import Profile from './components/User/profile';
 import PostUpload from './components/User/postUpload';
-import Login from './components/Auth/Login';
-import Register from './components/Auth/Register';
+import Login from './components/auth/Login';
 import SignUp from './components/auth/SignUp';
 import Blog from './components/blog/Blog'; // Import the Blog component
 import BlogPost from './components/blog/BlogPost'; // Import the BlogPost component
