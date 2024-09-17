@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 
 function SignUp() {
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [accountCreated, setAccountCreated] = useState(false);
   const [apiError, setApiError] = useState(null);
+  const [emailSent, setEmailSent] = useState(false);
 
   const validateForm = () => {
     let formErrors = {};
 
-    if (!firstName.trim()) {
-      formErrors.firstName = "First Name is required.";
+    if (!fullName.trim()) {
+      formErrors.fullName = "Full Name is required.";
     }
     
-    if (!lastName.trim()) {
-      formErrors.lastName = "Last Name is required.";
+    if (!userName.trim()) {
+      formErrors.userName = "Username is required.";
     }
 
     if (!email.trim()) {
@@ -50,17 +51,15 @@ function SignUp() {
         setApiError(null);
 
         const response = await axios.post('http://localhost:5000/api/signup', {
-          firstName,
-          lastName,
+          fullName,
+          userName,
           email,
           password,
         });
 
         if (response.status === 201) {
           setAccountCreated(true);
-          setTimeout(() => {
-            navigate('/blog');
-          }, 2000);
+          setEmailSent(true);  // Indicates email verification was sent
         }
       } catch (error) {
         if (error.response && error.response.data.message) {
@@ -74,12 +73,17 @@ function SignUp() {
 
   return (
     <Container className="signup-container mt-5">
-      {/* Header */}
       <h1 className="text-center">Sign Up</h1>
 
       {accountCreated && (
         <Alert variant="success">
-          Account created successfully! Redirecting to blog page...
+          Account created successfully! Please check your email to verify your account.
+        </Alert>
+      )}
+
+      {emailSent && (
+        <Alert variant="info">
+          A verification email has been sent to {email}. Please follow the instructions to complete your registration.
         </Alert>
       )}
 
@@ -90,29 +94,29 @@ function SignUp() {
       )}
 
       <Form>
-        <Form.Group className="mb-3" controlId="formFirstName">
+        <Form.Group className="mb-3" controlId="formFullName">
           <Form.Control
             type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            isInvalid={!!errors.firstName}
+            placeholder="Full Name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            isInvalid={!!errors.fullName}
           />
           <Form.Control.Feedback type="invalid">
-            {errors.firstName}
+            {errors.fullName}
           </Form.Control.Feedback>
         </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formLastName">
+        <Form.Group className="mb-3" controlId="formUserName">
           <Form.Control
             type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            isInvalid={!!errors.lastName}
+            placeholder="User Name"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            isInvalid={!!errors.userName}
           />
           <Form.Control.Feedback type="invalid">
-            {errors.lastName}
+            {errors.userName}
           </Form.Control.Feedback>
         </Form.Group>
 
@@ -158,4 +162,5 @@ function SignUp() {
 }
 
 export default SignUp;
+
 
