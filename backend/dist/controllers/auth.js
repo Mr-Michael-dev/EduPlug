@@ -1,5 +1,5 @@
 /// <reference types="express" />
-/// <reference path="../types/express/express.d.ts" />
+/// <reference path="../../express.d.ts" />
 import { User } from '../models/User.js';
 import { generateToken, hashPassword, random } from '../utils/index.js';
 import redisClient from '../db/redis.js'; // Redis redisClient
@@ -103,8 +103,8 @@ export const login = async (req, res) => {
         // Send JWT in an HTTP-only cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production', // true in production for HTTPS
+            sameSite: 'strict', // prevent CSRF
             maxAge: 60 * 60 * 1000, // 1 hour
         });
         return res.status(200).json({ message: 'Login successful' });

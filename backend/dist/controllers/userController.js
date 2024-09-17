@@ -17,7 +17,7 @@ export const getProfile = async (req, res) => {
             username: user.username,
             email: user.email,
             role: user.role,
-            profilePic: profilePicUrl,
+            profilePic: profilePicUrl, // Full URL for the profile picture
             isVerified: user.isVerified
         });
     }
