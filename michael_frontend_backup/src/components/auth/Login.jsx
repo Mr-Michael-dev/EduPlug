@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
+import { useNavigate, Link } from 'react-router-dom';
 import './signUp.css'
 import axios from 'axios';
 
@@ -37,7 +38,7 @@ function Login() {
         setErrors({});
         setLoginError(null);
 
-        const response = await axios.post('http://localhost:5000/api/login', {
+        const response = await axios.post('http://localhost:5000/api/v1/login', {
           email,
           password,
         });
@@ -97,6 +98,10 @@ function Login() {
             Login
           </Button>
         </Form>
+
+        <p className="mt-3">
+        Don't have an account yet? <Link to="/signup">Sign up</Link>
+      </p>
       </div>
     </Container>
   );

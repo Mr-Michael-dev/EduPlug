@@ -4,6 +4,10 @@ import PostCard from './postCard/PostCard';
 import LoadingCard from './postCard/LoadingCard'; // New loading card component
 import LatestPost from './latestPosts/LatestPost';
 import LoadingPost from './latestPosts/LoadingPost'; // New loading post component
+import carousel_1 from '../../assets/carousel_1.png'
+import carousel_2 from '../../assets/carousel_2.png'
+import carousel_3 from '../../assets/carousel_3.png'
+import './home.css'
 import useFetchPosts from '../../assets/customHooks/UseFetchPosts';
 
 const Home = () => {
@@ -22,12 +26,36 @@ const Home = () => {
           <Carousel.Item>
             <img
               className="d-block w-100"
-              src="https://via.placeholder.com/1200x400"
+              src={carousel_1}
               alt="First slide"
             />
             <Carousel.Caption>
-              <h3>Welcome to Our Blog</h3>
+              <h3>Welcome to EduPlug</h3>
+              <p>We plug learners to knowledge</p>
+              <Button variant="primary">Read More</Button>
+            </Carousel.Caption>
+          </Carousel.Item>
+          <Carousel.Item>
+            <img
+              className="d-block w-100"
+              src={carousel_2}
+              alt="Second slide"
+            />
+            <Carousel.Caption>
+              <h3>Educational Resources</h3>
               <p>Discover insightful articles and stories.</p>
+              <Button variant="primary">Read More</Button>
+            </Carousel.Caption>
+          </Carousel.Item>
+          <Carousel.Item>
+            <img
+              className="d-block w-100"
+              src={carousel_3}
+              alt="Third slide"
+            />
+            <Carousel.Caption>
+              <h3>Serving you knowledge</h3>
+              <p>We sponsor purely educational contents, articles, news ....</p>
               <Button variant="primary">Read More</Button>
             </Carousel.Caption>
           </Carousel.Item>

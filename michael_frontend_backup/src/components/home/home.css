@@ -46,3 +46,44 @@
     background-color: #2980b9;
   }
   
+  /* General styles for the carousel */
+.hero-section .carousel-item img {
+  width: 100%;
+  transition: filter 0.5s ease;
+  filter: blur(2px); /* Apply light blur by default */
+}
+
+/* Blurring effect and bold text on larger screens */
+@media (min-width: 768px) {
+  /* Bold and larger text for desktop/larger screens */
+  .hero-section .carousel-caption h3 {
+    font-weight: bold;
+    font-size: 2rem; /* Increase the size of the title */
+  }
+
+  .hero-section .carousel-caption p {
+    font-weight: bold;
+    font-size: 1.5rem; /* Increase the size of the description */
+  }
+
+  .hero-section .carousel-caption button {
+    font-size: 1.25rem; /* Increase the size of the button text */
+  }
+}
+
+/* Mobile view - Keep a lighter blur effect */
+@media (max-width: 767px) {
+  .hero-section .carousel-item img {
+    filter: blur(2px); /* Apply a light blur for mobile view */
+  }
+
+  .hero-section .carousel-caption h3,
+  .hero-section .carousel-caption p {
+    font-weight: bold;
+    font-size: 1.5rem; /* Make text bold but not too large on mobile */
+  }
+
+  .hero-section .carousel-caption button {
+    font-size: 1rem; /* Slightly smaller button text for mobile */
+  }
+}

@@ -21,13 +21,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/upload" element={<PostUpload />} />
           <Route path="/admin" element={<AdminDashboard />} />
           {/* New Routes for Blog and BlogPost */}
-          <Route path="/blog" element={<Blog />} /> {/* View all posts */}
+          <Route path="/blogs" element={<Blog />} /> {/* View all posts */}
           <Route path="/blog/:id" element={<BlogPost />} /> {/* View single post */}
         </Routes>
         <Footer />
@@ -37,23 +36,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-// export default App;
-
-
-// function App() {
-//   return (
-//     <Router> {/* Wrap the app in Router */}
-//       <>
-//         <Header />
-//         {/* Add your Routes here if needed */}
-//         <Footer />
-//       </>
-//     </Router>
-//   );
-// }
-
-// export default App;

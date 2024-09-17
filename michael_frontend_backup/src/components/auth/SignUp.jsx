@@ -1,6 +1,6 @@
 import React, { useState } from 'react'; 
 import { Form, Button, Container, Alert } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './signUp.css'
 import axios from 'axios';
 
@@ -56,7 +56,7 @@ function SignUp() {
         setErrors({});
         setApiError(null);
 
-        const response = await axios.post('http://localhost:5000/api/signup', {
+        const response = await axios.post('http://localhost:5000/api/v1/signup', {
           fullName,
           userName,
           email,
@@ -170,6 +170,10 @@ function SignUp() {
             Create Account
           </Button>
         </Form>
+
+        <p className="mt-3">
+        Already have an account? <Link to="/login">Sign in</Link>
+      </p>
 
         <p className="mt-3">
           By signing up, you agree to our{' '}

@@ -27,9 +27,8 @@ function Header() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="#blogs">Blogs</Nav.Link>
+            <Nav.Link href="/blogs">Blogs</Nav.Link>
             <Nav.Link href="#about">About</Nav.Link>
-            <Nav.Link href="#contacts">Contacts</Nav.Link>
             <NavDropdown title="Resources" id="basic-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Coming soon</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">
@@ -39,7 +38,6 @@ function Header() {
             </NavDropdown>
           </Nav>
           <Button variant="outline-info" className="mx-2" onClick={() => navigate('/login')}>Login</Button>
-          <Button variant="info" onClick={() => navigate('/register')}>Register</Button>
           <Button variant="info" onClick={() => navigate('/signup')}>Sign Up</Button>
         </Navbar.Collapse>
       </Container>
