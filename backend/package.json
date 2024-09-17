@@ -10,7 +10,7 @@
     "serve": "nodemon dist/index.js",
     "lint": "eslint",
     "test": "mocha 'dist/tests/*.js'",
-    "dev": "nodemon --exec babel-node --presets babel-preset-env src/server.ts",
+    "dev": "nodemon --exec babel-node --presets babel-preset-env src/index.ts",
     "unittest": "./node_modules/mocha/bin/mocha --require babel-register --exit"
   },
   "dependencies": {
