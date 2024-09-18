@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Button, Container, Alert } from 'react-bootstrap';
+import { Form, Button, Container, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 import './signUp.css'
 import axios from 'axios';
@@ -9,6 +9,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const validateLoginForm = () => {
     let formErrors = {};
@@ -28,6 +29,7 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
 
     const formErrors = validateLoginForm();
 
@@ -44,6 +46,9 @@ function Login() {
         });
 
         if (response.status === 200) {
+          setTimeout(() => {
+            navigate('/home');
+          }, 3000);
           // Handle successful login
         }
       } catch (error) {
@@ -52,6 +57,8 @@ function Login() {
         } else {
           setLoginError('An error occurred. Please try again.');
         }
+      } finally {
+        setSubmitting(false);
       }
     }
   };
@@ -94,8 +101,8 @@ function Login() {
             </Form.Control.Feedback>
           </Form.Group>
 
-          <Button variant="primary" type="submit">
-            Login
+          <Button type="submit" disabled={submitting} variant="primary">
+            {submitting ? <Spinner size="sm" animation="border" /> : 'Login'}
           </Button>
         </Form>
 
