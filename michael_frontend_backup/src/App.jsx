@@ -23,7 +23,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/upload" element={<PostUpload />} />
+          <Route path="/create-post" element={<PostUpload />} />
           <Route path="/admin" element={<AdminDashboard />} />
           {/* New Routes for Blog and BlogPost */}
           <Route path="/blogs" element={<Blog />} /> {/* View all posts */}
