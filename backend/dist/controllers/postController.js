@@ -16,7 +16,7 @@ export const createPost = async (req, res) => {
             const post = new Post({
                 title,
                 content,
-                banner: `/uploads/post-banners/${req.file?.filename}`, // Save banner URL
+                banner: `/uploads/post-banners/${req.file?.filename}`,
                 author: req.user._id
             });
             await post.save();
@@ -56,7 +56,7 @@ export const getPostById = async (req, res) => {
         const bannerUrl = post.banner ? `${baseUrl}/${post.banner}` : null;
         // Return the post with the full banner URL
         res.json({
-            ...post.toObject(), // Convert the post to a plain object
+            ...post.toObject(),
             banner: bannerUrl // Full URL for the banner image
         });
     }

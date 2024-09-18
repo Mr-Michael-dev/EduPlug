@@ -16,17 +16,35 @@ export const register = async (req, res) => {
         const verificationCode = random();
         // Store verification code in Redis with an expiration time
         await redisClient.set(email, verificationCode, 900);
+        const verificationLink = `http://localhost:5173/verify-email?token=${verificationCode}`;
+        const htmlBody = `
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <div style="text-align: center;">
+          <img src="../../../michael_frontend_backup/src/assets/eduplug_logo_1_copy.png" alt="EduPlug Logo" style="width: 150px;"/>
+        </div>
+        <h2 style="text-align: center;">Welcome to EduPlug!</h2>
+        <p>Hi <strong>${username}</strong>,</p>
+        <p>Thank you for signing up. Please verify your email by using the code below:</p>
+        <h3 style="color: #007bff;">${verificationCode}</h3>
+        <p>You can also click the link below to verify your email:</p>
+        <a href="${verificationLink}" style="background-color: #007bff; color: #fff; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Verify Email</a>
+        <p>If you didn’t sign up, you can ignore this email.</p>
+        <br />
+        <p>Thanks, <br/> The EduPlug Team</p>
+      </div>
+    `;
         // Send verification email using nodemailer
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
         });
         const mailOptions = {
-            from: 'noreply@example.com',
+            from: '"EduPlug" <noreply@example.com>',
             to: email,
             subject: 'Verify Your Email',
-            text: `Your email verification code is: ${verificationCode}`,
+            html: htmlBody, // Use the HTML email template
         };
+        // Send the email
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.error('Error sending verification email:', error);
@@ -46,11 +64,11 @@ export const register = async (req, res) => {
         }
     }
 };
-// Verify email
+// Verify email by either token (link) or code (manual entry)
 export const verifyEmail = async (req, res) => {
     const { email, code } = req.body;
+    const token = req.query.token;
     try {
-        // find user and check if verified
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
@@ -58,30 +76,36 @@ export const verifyEmail = async (req, res) => {
         if (user.isVerified) {
             return res.status(403).json({ error: 'Email already verified' });
         }
-        // get cached code from redis
-        const verificationToken = await redisClient.get(email);
-        if (!verificationToken) {
-            return res.status(404).json({ error: 'Verification code not found' });
+        const verificationCode = await redisClient.get(email);
+        if (token) {
+            if (token !== verificationCode) {
+                return res.status(400).json({ error: 'Invalid verification token' });
+            }
         }
-        // delete the cached code from redis db
-        await redisClient.del(email);
-        // verify code
-        if (code === verificationToken) {
-            user.isVerified = true;
-            await user.save();
-            return res.json({ message: 'Email verified successfully' });
+        else if (code) {
+            if (code !== verificationCode) {
+                return res.status(400).json({ error: 'Invalid verification code' });
+            }
         }
         else {
-            return res.status(400).json({ error: 'Invalid verification code' });
+            return res.status(400).json({ error: 'Verification failed. Code or token required' });
         }
+        // Mark the user as verified
+        user.isVerified = true;
+        await user.save();
+        await redisClient.del(email);
+        const sessionToken = generateToken(user._id, user.role);
+        // Send JWT in an HTTP-only cookie
+        res.cookie('token', sessionToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 1000, // 1 hour
+        });
+        return res.status(200).json({ message: 'Email verified successfully' });
     }
     catch (error) {
-        if (error instanceof Error) {
-            return res.status(500).json({ error: error.message });
-        }
-        else {
-            return res.status(500).json({ error: 'Unknown error occurred' });
-        }
+        return res.status(500).json({ error: 'Internal server error' });
     }
 };
 // Login
@@ -103,8 +127,8 @@ export const login = async (req, res) => {
         // Send JWT in an HTTP-only cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // true in production for HTTPS
-            sameSite: 'strict', // prevent CSRF
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
             maxAge: 60 * 60 * 1000, // 1 hour
         });
         return res.status(200).json({ message: 'Login successful' });
