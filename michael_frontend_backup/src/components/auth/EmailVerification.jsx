@@ -12,49 +12,51 @@ function EmailVerification() {
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get('token');
+  const email = queryParams.get('email');
 
   // Handle email verification via link (token)
   useEffect(() => {
-    if (token) {
-      verifyEmailWithToken(token);
+    if (token && email) {
+      verifyEmailWithToken(token, email);
     }
-  }, [token]);
+  }, [token, email]);
 
-  const verifyEmailWithToken = async (token) => {
+  const verifyEmailWithToken = async (token, email) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/verify-email?token=${token}`);
+      const response = await axios.post(`http://localhost:5000/api/v1/users/verify-email`, { token, email });
       if (response.status === 200) {
         setVerified(true);
         setTimeout(() => {
-          navigate('/home');
+          navigate('/');
         }, 3000);
       }
     } catch (error) {
-      setError(error.response?.data?.message || 'Verification failed. Please try again.');
+      setError(error.response?.data?.error || 'Verification failed. Please try again.');
     }
   };
+
 
   // Handle manual code verification
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/verify-email', { email: 'user_email', code: verificationCode });
+      const response = await axios.post('http://localhost:5000/api/v1/users/verify-email', { email, token: verificationCode });
       if (response.status === 200) {
         setVerified(true);
         setTimeout(() => {
-          navigate('/home');
+          navigate('/');
         }, 3000);
       }
     } catch (error) {
-      setError(error.response?.data?.message || 'Verification failed. Please try again.');
+      setError(error.response?.data?.error || 'Verification failed. Please try again.');
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <Container className="mt-5">
+    <Container className="mt-5" style={{ height: '50vh'}}>
       {verified ? (
         <Alert variant="success">
           Email verified successfully! Redirecting to the home page...

@@ -50,32 +50,41 @@ function SignUp() {
   const handleCreateAccount = async (e) => {
     const formErrors = validateForm();
     e.preventDefault();
-    setSubmitting(true);
     
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
     } else {
       try {
+        setSubmitting(true);
         setErrors({});
         setApiError(null);
 
-        const response = await axios.post('http://localhost:5000/api/v1/signup', {
-          fullName,
-          userName,
-          email,
-          password,
-        });
+        const userData = {
+          fullname: fullName,
+          username: userName,
+          email: email,
+          password: password,
+        };
+        const response = await axios.post(
+          'http://localhost:5000/api/v1/users/signup', userData,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );        
 
         if (response.status === 201) {
           setAccountCreated(true);
           setEmailSent(true);  // Indicates email verification was sent
           setTimeout(() => {
-            navigate('/verify-email');
+            navigate(`/verify-email?email=${encodeURIComponent(email)}`);
           }, 3000);
         }
       } catch (error) {
-        if (error.response && error.response.data.message) {
-          setApiError(error.response.data.message);
+        console.log(error.response);
+        if (error.response && error.response.data.error) {
+          setApiError(error.response.data.error);
         } else {
           setApiError('An error occurred. Please try again.');
         } 

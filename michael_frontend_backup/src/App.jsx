@@ -9,6 +9,7 @@ import Profile from './components/User/profile';
 import PostUpload from './components/User/postUpload';
 import Login from './components/auth/Login';
 import SignUp from './components/auth/SignUp';
+import EmailVerification from './components/auth/EmailVerification'; // Import the VerifyEmail component
 import Blog from './components/blog/Blog'; // Import the Blog component
 import BlogPost from './components/blog/BlogPost'; // Import the BlogPost component
 import './App.css';
@@ -22,6 +23,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/verify-email" element={<EmailVerification />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/create-post" element={<PostUpload />} />
           <Route path="/admin" element={<AdminDashboard />} />

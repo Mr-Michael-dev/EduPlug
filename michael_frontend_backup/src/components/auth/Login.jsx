@@ -29,7 +29,6 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
 
     const formErrors = validateLoginForm();
 
@@ -37,10 +36,11 @@ function Login() {
       setErrors(formErrors);
     } else {
       try {
+        setSubmitting(true);
         setErrors({});
         setLoginError(null);
 
-        const response = await axios.post('http://localhost:5000/api/v1/login', {
+        const response = await axios.post('http://localhost:5000/api/v1/users/login', {
           email,
           password,
         });
@@ -52,8 +52,8 @@ function Login() {
           // Handle successful login
         }
       } catch (error) {
-        if (error.response && error.response.data.message) {
-          setLoginError(error.response.data.message);
+        if (error.response && error.response.data.error) {
+          setLoginError(error.response.data.error);
         } else {
           setLoginError('An error occurred. Please try again.');
         }

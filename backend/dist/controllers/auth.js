@@ -4,29 +4,33 @@ import { User } from '../models/User.js';
 import { generateToken, hashPassword, random } from '../utils/index.js';
 import redisClient from '../db/redis.js'; // Redis redisClient
 import nodemailer from 'nodemailer'; // For sending verification emails
+import { MongoError } from 'mongodb';
 // Register a new user
 export const register = async (req, res) => {
     const { fullname, username, email, password, role } = req.body;
+    const lowerCaseEmail = email.toLowerCase();
+    console.log(lowerCaseEmail);
     try {
         const hashedPassword = hashPassword(password);
         // Create new user
-        const user = new User({ fullname, username, email, password: hashedPassword, role, isVerified: false });
+        const user = new User({ fullname, username, email: lowerCaseEmail, password: hashedPassword, role, isVerified: false });
         await user.save();
         // Generate verification code
         const verificationCode = random();
         // Store verification code in Redis with an expiration time
-        await redisClient.set(email, verificationCode, 900);
-        const verificationLink = `http://localhost:5173/verify-email?token=${verificationCode}`;
+        await redisClient.set(lowerCaseEmail, verificationCode, 1800);
+        const verificationLink = `http://localhost:5173/verify-email?token=${verificationCode}&email=${encodeURIComponent(lowerCaseEmail)}`;
         const htmlBody = `
       <div style="font-family: Arial, sans-serif; color: #333;">
         <div style="text-align: center;">
           <img src="../../../michael_frontend_backup/src/assets/eduplug_logo_1_copy.png" alt="EduPlug Logo" style="width: 150px;"/>
         </div>
         <h2 style="text-align: center;">Welcome to EduPlug!</h2>
-        <p>Hi <strong>${username}</strong>,</p>
+        <p>Hi <strong>${fullname}</strong>,</p>
         <p>Thank you for signing up. Please verify your email by using the code below:</p>
+        <P><em>code expires in 30 minutes<em></p>
         <h3 style="color: #007bff;">${verificationCode}</h3>
-        <p>You can also click the link below to verify your email:</p>
+        <p>Alternatively, you can click the following link to verify your email:</p>
         <a href="${verificationLink}" style="background-color: #007bff; color: #fff; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Verify Email</a>
         <p>If you didn’t sign up, you can ignore this email.</p>
         <br />
@@ -56,7 +60,19 @@ export const register = async (req, res) => {
         return res.status(201).json({ message: 'User registered. Please check your email for verification.' });
     }
     catch (error) {
-        if (error instanceof Error) {
+        if (error instanceof MongoError && error.code === 11000) {
+            // Check which field caused the duplicate key error
+            if (error.message.includes('email_1')) {
+                return res.status(400).json({ error: 'Email already exists' });
+            }
+            else if (error.message.includes('username_1')) {
+                return res.status(400).json({ error: 'Username already exists' });
+            }
+            else {
+                return res.status(400).json({ error: 'Duplicate key error' });
+            }
+        }
+        else if (error instanceof Error) {
             return res.status(400).json({ error: error.message });
         }
         else {
@@ -66,41 +82,50 @@ export const register = async (req, res) => {
 };
 // Verify email by either token (link) or code (manual entry)
 export const verifyEmail = async (req, res) => {
-    const { email, code } = req.body;
-    const token = req.query.token;
+    // Extract email and code/token
+    const email = req.body.email;
+    const token = req.body.token;
+    // Ensure both email and token are provided
+    if (!email || !token) {
+        return res.status(400).json({ error: 'Email and token are required' });
+    }
+    // Lowercase email to ensure consistency
+    const lowerEmail = typeof email === 'string' ? email.toLowerCase() : '';
+    if (!lowerEmail) {
+        return res.status(400).json({ error: 'Invalid email format' });
+    }
     try {
-        const user = await User.findOne({ email });
+        // Find the user by email
+        const user = await User.findOne({ email: lowerEmail });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
+        // If user is already verified, return an error
         if (user.isVerified) {
             return res.status(403).json({ error: 'Email already verified' });
         }
-        const verificationCode = await redisClient.get(email);
-        if (token) {
-            if (token !== verificationCode) {
-                return res.status(400).json({ error: 'Invalid verification token' });
-            }
+        // Get verification code from Redis using the lowercase email
+        const verificationCode = await redisClient.get(lowerEmail);
+        if (!verificationCode) {
+            return res.status(400).json({ error: 'Verification code has expired or is invalid' });
         }
-        else if (code) {
-            if (code !== verificationCode) {
-                return res.status(400).json({ error: 'Invalid verification code' });
-            }
-        }
-        else {
-            return res.status(400).json({ error: 'Verification failed. Code or token required' });
+        // Compare provided code with the stored verification code
+        if (token !== verificationCode) {
+            return res.status(400).json({ error: 'Invalid verification code' });
         }
         // Mark the user as verified
         user.isVerified = true;
         await user.save();
-        await redisClient.del(email);
+        // Delete the verification code from Redis
+        await redisClient.del(lowerEmail);
+        // Generate session token for the user
         const sessionToken = generateToken(user._id, user.role);
-        // Send JWT in an HTTP-only cookie
+        // Send the JWT in an HTTP-only cookie
         res.cookie('token', sessionToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60 * 60 * 1000, // 1 hour
+            maxAge: 60 * 60 * 1000, // 1 hour expiration
         });
         return res.status(200).json({ message: 'Email verified successfully' });
     }
@@ -111,8 +136,9 @@ export const verifyEmail = async (req, res) => {
 // Login
 export const login = async (req, res) => {
     const { email, password } = req.body;
+    const lowerCaseEmail = email.toLowerCase();
     try {
-        const user = await User.findOne({ email }).select('+password');
+        const user = await User.findOne({ lowerCaseEmail }).select('+password');
         if (!user) {
             return res.status(404).json({ error: 'Invalid login credentials' });
         }
