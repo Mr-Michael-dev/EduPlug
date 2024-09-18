@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Button, Container, Alert } from 'react-bootstrap';
+import { Form, Button, Container, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 import './signUp.css'
 import axios from 'axios';
@@ -9,6 +9,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const validateLoginForm = () => {
     let formErrors = {};
@@ -35,23 +36,29 @@ function Login() {
       setErrors(formErrors);
     } else {
       try {
+        setSubmitting(true);
         setErrors({});
         setLoginError(null);
 
-        const response = await axios.post('http://localhost:5000/api/v1/login', {
+        const response = await axios.post('http://localhost:5000/api/v1/users/login', {
           email,
           password,
         });
 
         if (response.status === 200) {
+          setTimeout(() => {
+            navigate('/home');
+          }, 3000);
           // Handle successful login
         }
       } catch (error) {
-        if (error.response && error.response.data.message) {
-          setLoginError(error.response.data.message);
+        if (error.response && error.response.data.error) {
+          setLoginError(error.response.data.error);
         } else {
           setLoginError('An error occurred. Please try again.');
         }
+      } finally {
+        setSubmitting(false);
       }
     }
   };
@@ -94,8 +101,8 @@ function Login() {
             </Form.Control.Feedback>
           </Form.Group>
 
-          <Button variant="primary" type="submit">
-            Login
+          <Button type="submit" disabled={submitting} variant="primary">
+            {submitting ? <Spinner size="sm" animation="border" /> : 'Login'}
           </Button>
         </Form>
 

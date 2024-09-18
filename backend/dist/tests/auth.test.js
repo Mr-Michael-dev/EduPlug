@@ -93,8 +93,34 @@ describe('Comprehensive API Tests', () => {
     describe('Security Tests', () => {
         it('should prevent NoSQL injection', async () => {
             const res = await request(app).post('/api/v1/users/login').send({
-                email: { $gt: '' }, // NoSQL injection attempt
+                email: { $gt: '' },
                 password: 'password123',
+<<<<<<< HEAD
+=======
+                // Test Error Handling
+                describe() { }
+            }());
+            {
+                it('should return 404 for non-existent routes', async () => {
+                    const res = await request(app).get('/api/v1/non-existent-route');
+                    expect(res.status).to.equal(404);
+                });
+                it('should handle database errors gracefully', async () => {
+                    const res = await request(app).get('/api/v1/posts/invalid-id');
+                    expect(res.status).to.equal(400);
+                    expect(res.body).to.have.property('error');
+                });
+            }
+        });
+        // Test Security Vulnerabilities (e.g., SQL/NoSQL injection)
+        describe('Security Tests', () => {
+            it('should prevent NoSQL injection', async () => {
+                const res = await request(app).post('/api/v1/users/login').send({
+                    email: { $gt: '' },
+                    password: 'password123',
+                });
+                expect(res.status).to.equal(401);
+>>>>>>> 98e869ab13c7b8108e3f9c048786cd3ec77069dd
             });
             expect(res.status).to.equal(401);
         });

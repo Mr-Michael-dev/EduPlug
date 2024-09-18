@@ -1,5 +1,9 @@
 /// <reference types="express" />
+<<<<<<< HEAD
 // <reference path="../types/express/express.d.ts" />
+=======
+/// <reference path="../../express.d.ts" />
+>>>>>>> 98e869ab13c7b8108e3f9c048786cd3ec77069dd
 import { User } from '../models/User.js';
 import { fileUploader } from '../utils/upload.js';
 // Get user profile
@@ -17,7 +21,7 @@ export const getProfile = async (req, res) => {
             username: user.username,
             email: user.email,
             role: user.role,
-            profilePic: profilePicUrl, // Full URL for the profile picture
+            profilePic: profilePicUrl,
             isVerified: user.isVerified
         });
     }

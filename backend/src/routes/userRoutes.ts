@@ -11,7 +11,7 @@ import {getProfile, updateProfile, updateProfilePic, deleteProfile} from '../con
 
 const router = Router();
 
-router.post('/register', register);
+router.post('/signup', register);
 router.post('/verify-email', verifyEmail);
 router.post('/login', login);
 router.post('/logout', logout);

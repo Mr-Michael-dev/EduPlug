@@ -4,7 +4,7 @@ import { register, login, logout, verifyEmail, checkAuth, // Added checkAuth fun
 import { protect } from '../middleware/auth.js';
 import { getProfile, updateProfile, updateProfilePic, deleteProfile } from '../controllers/userController.js';
 const router = Router();
-router.post('/register', register);
+router.post('/signup', register);
 router.post('/verify-email', verifyEmail);
 router.post('/login', login);
 router.post('/logout', logout);
