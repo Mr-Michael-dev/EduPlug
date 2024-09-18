@@ -1,5 +1,5 @@
 /// <reference types="express" />
-/// <reference path="../types/express/express.d.ts" />
+/// <reference path="../../express.d.ts" />
 import { User } from '../models/User.js';
 import { fileUploader } from '../utils/upload.js';
 // Get user profile
