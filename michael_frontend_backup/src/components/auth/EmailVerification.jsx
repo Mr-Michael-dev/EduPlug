@@ -23,7 +23,7 @@ function EmailVerification() {
 
   const verifyEmailWithToken = async (token, email) => {
     try {
-      const response = await axios.post(`http://localhost:5000/api/v1/users/verify-email`, { token, email });
+      const response = await axios.post(`http://localhost:5000/api/v1/users/verify-email`, { token, email }, { withCredentials: true });
       if (response.status === 200) {
         setVerified(true);
         setTimeout(() => {
@@ -41,7 +41,7 @@ function EmailVerification() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/users/verify-email', { email, token: verificationCode });
+      const response = await axios.post('http://localhost:5000/api/v1/users/verify-email', { email, token: verificationCode }, { withCredentials: true });
       if (response.status === 200) {
         setVerified(true);
         setTimeout(() => {

@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
+import LargeSpinner from '../notifications/LargeSpinner';
 import './signUp.css'
 import axios from 'axios';
 
 function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showSpinner, setShowSpinner] = useState(false);
 
   const validateLoginForm = () => {
     let formErrors = {};
@@ -39,17 +44,20 @@ function Login() {
         setSubmitting(true);
         setErrors({});
         setLoginError(null);
+   
 
         const response = await axios.post('http://localhost:5000/api/v1/users/login', {
           email,
           password,
-        });
+        }, { withCredentials: true });
 
         if (response.status === 200) {
+          setShowSpinner(true);
+          await login();
           setTimeout(() => {
-            navigate('/home');
-          }, 3000);
-          // Handle successful login
+            setShowSpinner(false); // Hide the spinner
+            navigate('/'); // Navigate to home page
+          }, 3000); // Optional delay to keep spinner visible for a moment
         }
       } catch (error) {
         if (error.response && error.response.data.error) {
@@ -64,7 +72,7 @@ function Login() {
   };
 
   return (
-    <Container className="login-container mt-5 mb-5">
+    <Container className={`login-container mt-5 mb-5 ${showSpinner ? 'blur' : ''}`}>
       <div className="form-box">
         <h1 className="text-center">Login</h1>
 
@@ -110,6 +118,9 @@ function Login() {
         Don't have an account yet? <Link to="/signup">Sign up</Link>
       </p>
       </div>
+
+      {/* Show LargeSpinner if showSpinner is true */}
+      {showSpinner && <LargeSpinner />}
     </Container>
   );
 }

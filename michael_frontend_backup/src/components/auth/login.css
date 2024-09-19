@@ -12,4 +12,13 @@
       max-width: 100%; /* Full width on smaller screens */
     }
   }
-  
+
+/* Login.css */
+.login-container {
+  position: relative; /* Ensure it's relative to handle the blur */
+  transition: filter 0.3s ease;
+}
+
+.login-container.blur {
+  filter: blur(4px); /* Adjust blur level as needed */
+}
