@@ -1,6 +1,5 @@
 /// <reference types="express" />
 /// <reference path="../../express.d.ts" />
-
 import { User } from '../models/User.js';
 import { fileUploader } from '../utils/upload.js';
 // Get user profile
@@ -93,4 +92,21 @@ export const updateProfilePic = async (req, res) => {
             return res.status(500).json({ error: 'Server error' });
         }
     });
+};
+export const getActivityHistory = async (req, res) => {
+    try {
+        const user = await User.findById(req.user?._id).populate('activityHistory.postId');
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        return res.json(user.activityHistory);
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            return res.status(500).json({ error: 'Server error' });
+        }
+        else {
+            return res.status(500).json({ error: 'Unknown error occurred' });
+        }
+    }
 };

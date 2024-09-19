@@ -8,6 +8,11 @@ const userSchema = new Schema({
     role: { type: String, enum: ['admin', 'contributor', 'visitor'], default: 'visitor' },
     profilePic: { type: String, default: '' },
     isVerified: { type: Boolean, default: false },
+    activityHistory: [{
+            action: { type: String, enum: ['liked', 'commented', 'viewed'], required: true },
+            postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
+            timestamp: { type: Date, default: Date.now }
+        }],
 });
 userSchema.methods.matchPassword = async function (password) {
     return bcrypt.compare(password, this.password);
