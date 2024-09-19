@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/header/Header';
 import Footer from './components/footer/Footer';
+import AboutUs from './components/aboutUs/aboutUs.jsx';
 import Home from './components/home/Home';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import Profile from './components/User/profile';
@@ -25,6 +26,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/upload" element={<PostUpload />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/aboutUs" element={<AboutUs />} />
           {/* New Routes for Blog and BlogPost */}
           <Route path="/blogs" element={<Blog />} /> {/* View all posts */}
           <Route path="/blog/:id" element={<BlogPost />} /> {/* View single post */}
