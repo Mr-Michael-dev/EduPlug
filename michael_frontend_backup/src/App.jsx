@@ -12,6 +12,9 @@ import SignUp from './components/auth/SignUp';
 import EmailVerification from './components/auth/EmailVerification'; // Import the VerifyEmail component
 import Blog from './components/blog/Blog'; // Import the Blog component
 import BlogPost from './components/blog/BlogPost'; // Import the BlogPost component
+import CodeOfConduct from './components/legal/CodeOfConduct'
+import PrivacyPolicy from './components/legal/PrivacyPolicy'
+import TermsOfUse from './components/legal/TermsOfUse'
 import PrivateRoute from './components/auth/PrivateRoute';
 import { AuthProvider } from './components/auth/AuthContext';
 import './App.css';
@@ -27,6 +30,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/verify-email" element={<EmailVerification />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-use" element={<TermsOfUse />} />
+          <Route path="/code-of-conduct" element={<CodeOfConduct />} />
           {/* New Routes for Blog and BlogPost */}
           <Route path="/blogs" element={<Blog />} /> {/* View all posts */}
           <Route path="/blog/:id" element={<BlogPost />} /> {/* View single post */}
