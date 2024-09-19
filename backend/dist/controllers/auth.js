@@ -23,7 +23,7 @@ export const register = async (req, res) => {
         const htmlBody = `
       <div style="font-family: Arial, sans-serif; color: #333;">
         <div style="text-align: center;">
-          <img src="../../../michael_frontend_backup/src/assets/eduplug_logo_1_copy.png" alt="EduPlug Logo" style="width: 150px;"/>
+          <img src="./eduplug_logo_1_copy.png" alt="EduPlug Logo" style="width: 150px;"/>
         </div>
         <h2 style="text-align: center;">Welcome to EduPlug!</h2>
         <p>Hi <strong>${fullname}</strong>,</p>
@@ -138,7 +138,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     const lowerCaseEmail = email.toLowerCase();
     try {
-        const user = await User.findOne({ lowerCaseEmail }).select('+password');
+        const user = await User.findOne({ email: lowerCaseEmail }).select('+password');
         if (!user) {
             return res.status(404).json({ error: 'Invalid login credentials' });
         }
