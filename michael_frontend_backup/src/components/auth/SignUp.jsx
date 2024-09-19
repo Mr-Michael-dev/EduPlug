@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; 
-import { Form, Button, Container, Alert } from 'react-bootstrap';
+import { Form, Button, Container, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 import './signUp.css'
 import axios from 'axios';
@@ -9,6 +9,7 @@ function SignUp() {
   const [fullName, setFullName] = useState('');
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -46,33 +47,49 @@ function SignUp() {
     return formErrors;
   };
 
-  const handleCreateAccount = async () => {
+  const handleCreateAccount = async (e) => {
     const formErrors = validateForm();
-
+    e.preventDefault();
+    
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
     } else {
       try {
+        setSubmitting(true);
         setErrors({});
         setApiError(null);
 
-        const response = await axios.post('http://localhost:5000/api/v1/signup', {
-          fullName,
-          userName,
-          email,
-          password,
-        });
+        const userData = {
+          fullname: fullName,
+          username: userName,
+          email: email,
+          password: password,
+        };
+        const response = await axios.post(
+          'http://localhost:5000/api/v1/users/signup', userData,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );        
 
         if (response.status === 201) {
           setAccountCreated(true);
           setEmailSent(true);  // Indicates email verification was sent
+          setTimeout(() => {
+            navigate(`/verify-email?email=${encodeURIComponent(email)}`);
+          }, 3000);
         }
       } catch (error) {
-        if (error.response && error.response.data.message) {
-          setApiError(error.response.data.message);
+        console.log(error.response);
+        if (error.response && error.response.data.error) {
+          setApiError(error.response.data.error);
         } else {
           setApiError('An error occurred. Please try again.');
-        }
+        } 
+      } finally {
+        setSubmitting(false);
       }
     }
   };
@@ -100,7 +117,7 @@ function SignUp() {
           </Alert>
         )}
 
-        <Form>
+        <Form onSubmit={handleCreateAccount}>
           <Form.Group className="mb-3" controlId="formFullName">
             <Form.Control
               type="text"
@@ -166,8 +183,8 @@ function SignUp() {
             </Form.Control.Feedback>
           </Form.Group>
 
-          <Button variant="primary" type="button" onClick={handleCreateAccount}>
-            Create Account
+          <Button type="submit" disabled={submitting} variant="primary">
+            {submitting ? <Spinner size="sm" animation="border" /> : 'Create Account'}
           </Button>
         </Form>
 

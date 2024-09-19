@@ -3,24 +3,24 @@ import { Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import './home.css';
 
-function PostCard({ title, description, imageUrl }) {
-  return (
-    <Card className="card">
-      <Card.Img variant="top" src={imageUrl} className="card-img-top" />
-      <Card.Body className="card-body">
-        <Card.Title className="card-title">{title}</Card.Title>
-        <Card.Text className="card-text">
-          {description}
-        </Card.Text>
-        <Link to={`/blog/${title.toLowerCase().replace(/\s+/g, '-')}`} className="btn btn-primary">
-          Read More
-        </Link>
-      </Card.Body>
-    </Card>
-  );
-}
+// function PostCard({ title, description, imageUrl }) {
+//   return (
+//     <Card className="card">
+//       <Card.Img variant="top" src={imageUrl} className="card-img-top" />
+//       <Card.Body className="card-body">
+//         <Card.Title className="card-title">{title}</Card.Title>
+//         <Card.Text className="card-text">
+//           {description}
+//         </Card.Text>
+//         <Link to={`/blog/${title.toLowerCase().replace(/\s+/g, '-')}`} className="btn btn-primary">
+//           Read More
+//         </Link>
+//       </Card.Body>
+//     </Card>
+//   );
+// }
 
-export default PostCard;
+// export default PostCard;
 
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';

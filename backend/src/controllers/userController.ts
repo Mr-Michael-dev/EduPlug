@@ -1,4 +1,7 @@
-import { Request, Response } from 'express'; 
+/// <reference types="express" />
+/// <reference path="../../express.d.ts" />
+
+import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User.js';
 import { fileUploader } from '../utils/upload.js';
 

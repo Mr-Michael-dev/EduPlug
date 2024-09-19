@@ -7,13 +7,18 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
 import eduplug_logo_1_copy from "../../assets/eduplug_logo_1_copy.png";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
+import Logout from "../auth/Logout";
+import profilePic from '../../assets/profilePic.webp'; // Assumes default profile picture
 
 function Header() {
-  const navigate = useNavigate(); 
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
   return (
     <Navbar  expand="lg" className="bg-dark navbar-dark" sticky="top">
       <Container>
-      <Navbar.Brand href="#home" className="d-flex align-items-center">
+      <Navbar.Brand href="#home" className="d-flex align-items-center ms-3">
             <img
               alt=""
               src={eduplug_logo_1_copy}
@@ -23,22 +28,51 @@ function Header() {
             />{' '}
             <b style={{ lineHeight: '40px' }}>EduPlug</b>
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle aria-controls="basic-navbar-nav" className="me-3"/>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/blogs">Blogs</Nav.Link>
+            <Nav.Link href="/blogs">Blog</Nav.Link>
             <Nav.Link href="#about">About</Nav.Link>
-            <NavDropdown title="Resources" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Coming soon</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
-                Coming soon
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Coming soon</NavDropdown.Item>
-            </NavDropdown>
           </Nav>
-          <Button variant="outline-info" className="mx-2" onClick={() => navigate('/login')}>Login</Button>
-          <Button variant="info" onClick={() => navigate('/signup')}>Sign Up</Button>
+          {/* Conditionally render based on user authentication */}
+          {isAuthenticated ? (
+              <>
+                <NavDropdown
+                  title={
+                    <img
+                      src={user.profilePic || profilePic} // Assumes user object has profilePic
+                      alt="Profile"
+                      width="40"
+                      height="40"
+                      style={{ borderRadius: '50%' }}
+                    />
+                  }
+                  id="user-nav-dropdown"
+                >
+                  <NavDropdown.Item href="/profile">{user.username}</NavDropdown.Item>
+                  <NavDropdown.Item>
+                    <Logout />
+                  </NavDropdown.Item>
+
+                </NavDropdown>
+                {/* Render Create Post button for admins or contributors */}
+                {(user.role === 'admin' || user.role === 'contributor') && (
+                  <Button variant="outline-info" onClick={() => navigate('/create-post')}>
+                    Create Post
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <Button variant="outline-info" className="mx-2" onClick={() => navigate('/login')}>
+                  Login
+                </Button>
+                <Button variant="info" onClick={() => navigate('/signup')}>
+                  Sign Up
+                </Button>
+              </>
+            )}
         </Navbar.Collapse>
       </Container>
     </Navbar>

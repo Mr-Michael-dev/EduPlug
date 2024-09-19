@@ -199,7 +199,7 @@ describe('Comprehensive API Tests', () => {
     describe('Security Tests', () => {
         it('should prevent NoSQL injection', async () => {
             const res = await request(app).post('/api/v1/users/login').send({
-                email: { $gt: '' }, // NoSQL injection attempt
+                email: { $gt: '' },
                 password: 'password123',
                 // Test Error Handling
                 describe() { }
@@ -220,7 +220,7 @@ describe('Comprehensive API Tests', () => {
         describe('Security Tests', () => {
             it('should prevent NoSQL injection', async () => {
                 const res = await request(app).post('/api/v1/users/login').send({
-                    email: { $gt: '' }, // NoSQL injection attempt
+                    email: { $gt: '' },
                     password: 'password123',
                 });
                 expect(res.status).to.equal(401);
