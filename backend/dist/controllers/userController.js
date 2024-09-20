@@ -18,7 +18,8 @@ export const getProfile = async (req, res) => {
             email: user.email,
             role: user.role,
             profilePic: profilePicUrl,
-            isVerified: user.isVerified
+            isVerified: user.isVerified,
+            activityHistory: user.activityHistory
         });
     }
     catch (error) {

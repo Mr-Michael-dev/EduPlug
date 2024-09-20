@@ -31,3 +31,15 @@ export const authorizeRoles = (...roles: string[]) => {
     next();
   };
 };
+
+export const checkAdminToken = (req: Request, res: Response, next: NextFunction): void => {
+  const { token } = req.body;  // Get token from the request body
+
+  if (token === process.env.ADMIN_REGISTRATION_TOKEN) {
+    next();  // Proceed if the token matches
+  } else {
+    res.status(403).json({ message: "Forbidden: Invalid admin token" });  // Block access if token is incorrect
+  }
+};
+
+
