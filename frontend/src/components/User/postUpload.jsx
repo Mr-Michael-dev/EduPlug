@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button, Image, Container } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import Quill styles
+import axios from 'axios';
 
 // Custom toolbar for Quill editor with link and code block options
 const modules = {
@@ -21,20 +22,53 @@ function PostUpload() {
   const [postTitle, setPostTitle] = useState('');
   const [postText, setPostText] = useState('');
   const [postBanner, setPostBanner] = useState(null);
-
-  const handlePost = () => {
-    // Simulate API Call to submit the post
-    console.log("Post Data:", { postTitle, postText, postBanner });
-  };
+  const [previewBanner, setPreviewBanner] = useState(null);  // For displaying image preview
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleBannerUpload = (e) => {
     const file = e.target.files[0];
-    setPostBanner(URL.createObjectURL(file));
+    setPostBanner(file);
+    setPreviewBanner(URL.createObjectURL(file));  // Display preview
+  };
+
+  const handlePost = async () => {
+    if (!postTitle || !postText || !postBanner) {
+      setError('Please fill all fields and upload a banner.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', postTitle);
+    formData.append('content', postText);
+    formData.append('banner', postBanner);  // Upload the banner image
+
+    try {
+      const response = await axios.post('/api/v1/create-post', formData, {
+        withCredentials: true,  // Include cookies for authentication
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setSuccessMessage('Post created successfully!');
+      setPostTitle('');
+      setPostText('');
+      setPostBanner(null);
+      setPreviewBanner(null);
+      setError('');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to create post');
+    }
   };
 
   return (
     <Container className="post-upload-page py-4" style={{ maxWidth: '800px' }}>
       <h2 className="text-center mb-4">Create a Post</h2>
+
+      {error && <div className="alert alert-danger">{error}</div>}
+      {successMessage && <div className="alert alert-success">{successMessage}</div>}
+
       <Form>
         {/* Post Banner Upload */}
         <Form.Group controlId="formFileBanner" className="mb-4">
@@ -43,9 +77,9 @@ function PostUpload() {
         </Form.Group>
 
         {/* Display the uploaded banner */}
-        {postBanner && (
+        {previewBanner && (
           <div className="mb-4 text-center">
-            <Image src={postBanner} alt="Post Banner" fluid rounded style={{ maxHeight: '400px', objectFit: 'cover' }} />
+            <Image src={previewBanner} alt="Post Banner" fluid rounded style={{ maxHeight: '400px', objectFit: 'cover' }} />
           </div>
         )}
 

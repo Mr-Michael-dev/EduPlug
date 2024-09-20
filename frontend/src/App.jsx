@@ -6,6 +6,7 @@ import Footer from './components/footer/Footer';
 import AboutUs from './components/aboutUs/AboutUs.jsx';
 import Home from './components/home/Home';
 import AdminDashboard from './components/Admin/AdminDashboard';
+import AdminSignUp from './components/Admin/AdminSignUp';
 import Profile from './components/User/profile';
 import PostUpload from './components/User/postUpload';
 import Login from './components/auth/Login';
@@ -29,9 +30,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/admins/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/admins/signup" element={<AdminSignUp />} />
           <Route path="/aboutUs" element={<AboutUs />} />
           <Route path="/verify-email" element={<EmailVerification />} />
+          <Route path="/admins/verify-email" element={<EmailVerification />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-use" element={<TermsOfUse />} />
           <Route path="/code-of-conduct" element={<CodeOfConduct />} />

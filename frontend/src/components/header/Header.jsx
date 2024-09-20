@@ -12,7 +12,7 @@ import Logout from "../auth/Logout";
 import profilePic from '../../assets/profilePic.webp'; // Assumes default profile picture
 
 function Header() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   return (

@@ -1,98 +1,46 @@
 import React from 'react';
-import { Card } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import './home.css';
+import { Card, Image } from 'react-bootstrap';
 
-// function PostCard({ title, description, imageUrl }) {
-//   return (
-//     <Card className="card">
-//       <Card.Img variant="top" src={imageUrl} className="card-img-top" />
-//       <Card.Body className="card-body">
-//         <Card.Title className="card-title">{title}</Card.Title>
-//         <Card.Text className="card-text">
-//           {description}
-//         </Card.Text>
-//         <Link to={`/blog/${title.toLowerCase().replace(/\s+/g, '-')}`} className="btn btn-primary">
-//           Read More
-//         </Link>
-//       </Card.Body>
-//     </Card>
-//   );
-// }
-
-// export default PostCard;
-
-import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
-import { fetchPosts, likePost, commentOnPost } from '../../services/api';
-import LikeButton from './LikeButton';
-import Comment from './Comment';
-
-function PostCard({ post, isAdmin = false, onDelete }) {
-  const { user, token } = useContext(AuthContext);
-  const [likes, setLikes] = useState(post.likes || []);
-  const [comments, setComments] = useState(post.comments || []);
-  const [commentText, setCommentText] = useState('');
-
-  const handleLike = async () => {
-    try {
-      const updatedLikes = await likePost(token, post.id);
-      setLikes(updatedLikes);
-    } catch (error) {
-      console.error('Error liking post:', error);
-      alert('Failed to like the post.');
-    }
-  };
-
-  const handleComment = async (e) => {
-    e.preventDefault();
-    if (!commentText.trim()) return;
-
-    try {
-      const newComment = await commentOnPost(token, post.id, commentText);
-      setComments([...comments, newComment]);
-      setCommentText('');
-    } catch (error) {
-      console.error('Error commenting on post:', error);
-      alert('Failed to add comment.');
-    }
-  };
-
+const PostCard = ({ title, tags, reactions, comments, readTime, author, date, authorImage }) => {
   return (
-    <div className="card mb-4">
-      {post.image && <img src={post.image} className="card-img-top" alt="Post" />}
-      <div className="card-body">
-        <h5 className="card-title">{post.author.username}</h5>
-        <p className="card-text">{post.text}</p>
-        <LikeButton likes={likes} onLike={handleLike} />
-        <hr />
-        <h6>Comments:</h6>
-        {comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
-        ))}
-        <form onSubmit={handleComment} className="mt-3">
-          <div className="input-group">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Add a comment..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              required
-            />
-            <button type="submit" className="btn btn-primary">
-              Comment
-            </button>
+    <div className="d-flex justify-content-center">
+      <Card style={{ width: '70%' }} className="my-3">
+        <Card.Body>
+          <div className="d-flex align-items-center mb-2">
+            <Image src={authorImage} roundedCircle width={40} height={40} className="me-3" />
+            <div>
+              <h6 className="mb-0">{author}</h6>
+              <small className="text-muted">{date}</small>
+            </div>
           </div>
-        </form>
-        {isAdmin && (
-          <button className="btn btn-danger mt-3" onClick={() => onDelete(post.id)}>
-            Delete Post
-          </button>
-        )}
-      </div>
+          <Card.Title>{title}</Card.Title>
+          <div className="mb-2">
+            {tags.map((tag, index) => (
+              <span key={index} className="badge bg-secondary me-1">
+                #{tag}
+              </span>
+            ))}
+          </div>
+          <div className="d-flex justify-content-between">
+            <div>
+              {reactions ? (
+                <span>{reactions} reactions</span>
+              ) : (
+                <span>No reactions yet</span>
+              )}
+              {' | '}
+              {comments ? (
+                <span>{comments} comments</span>
+              ) : (
+                <span>No comments yet</span>
+              )}
+            </div>
+            <span>{readTime} min read</span>
+          </div>
+        </Card.Body>
+      </Card>
     </div>
   );
-}
+};
 
 export default PostCard;

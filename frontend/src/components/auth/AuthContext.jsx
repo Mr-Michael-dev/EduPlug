@@ -9,15 +9,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate(); // For programmatic navigation
 
   // Function to fetch authenticated user from backend (checkauth)
   const checkAuth = async () => {
     try {
       const response = await axios.post('http://localhost:5000/api/v1/users/check-auth', {}, { withCredentials: true });
       if (response.status === 200) {
-        console.log(response.data)
         setUser(response.data.user);
         setIsAuthenticated(true);
+        if (response.data.user.role === 'admin') {
+          setIsAdmin(true);
+        }
       } else {
         setIsAuthenticated(false);
       }
@@ -30,13 +34,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Fetch user info on initial load
   useEffect(() => {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    // Redirect to admin dashboard if user is an admin
+    if (isAdmin && isAuthenticated) {
+      navigate('/admin-dashboard');
+    }
+  }, [isAdmin, isAuthenticated, navigate]);
+
   const login = async () => {
-    await checkAuth(); // Call this after login to refresh user state
+    await checkAuth();
   };
 
   const logout = async () => {
@@ -44,14 +54,14 @@ export const AuthProvider = ({ children }) => {
       await axios.post('http://localhost:5000/api/v1/users/logout', {}, { withCredentials: true });
       setUser(null);
       setIsAuthenticated(false);
+      setIsAdmin(false);
     } catch (error) {
       console.error('Error during logout:', error);
     }
   };
 
-  // Provide the context values to children
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

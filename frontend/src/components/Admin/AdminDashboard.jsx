@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 import { Container, Table, Button, Modal, Form } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function AdminDashboard() {
@@ -10,11 +12,26 @@ function AdminDashboard() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', content: '' });
+  const { user, isAdmin, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect non-admin users
+  useEffect(() => {
+    if (!loading && (!isAuthenticated || !isAdmin)) {
+      navigate('/'); // Redirect to the homepage or a login page if not admin
+    } else {
+      setUsers(user);
+    }
+  }, [isAuthenticated, isAdmin, loading, navigate, user]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading indicator while fetching auth state
+  }
 
   useEffect(() => {
     const fetchData = async () => {
-      const postsResponse = await axios.get('/api/posts');
-      const usersResponse = await axios.get('/api/users');
+      const postsResponse = await axios.get('/api/v1/posts');
+      const usersResponse = await axios.get('/api/v1/users');
       setPosts(postsResponse.data);
       setUsers(usersResponse.data);
     };

@@ -1,52 +1,26 @@
-/* Basic blog styling */
 .blog-container {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  
-  .blog-title {
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .blog-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .blog-list li {
-    margin-bottom: 10px;
-  }
-  
-  .blog-link {
-    color: #3498db;
-    text-decoration: none;
-    font-size: 1.2rem;
-  }
-  
-  .blog-link:hover {
-    text-decoration: underline;
-  }
-  
-  .blog-post-title {
-    font-size: 2rem;
-    margin-bottom: 15px;
-    color: #333;
-  }
-  
-  .blog-post-content {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: #555;
-  }
-  
-  .blog-post-container {
-    padding: 20px;
-    max-width: 700px;
-    margin: 0 auto;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-  }
-  
+  width: 70%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.post-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 20px;
+}
+
+.post-card-container {
+  transition: transform 0.2s ease-in-out;
+}
+
+.post-card-container:hover {
+  transform: scale(1.05);
+}
+
+.loading {
+  text-align: center;
+  font-size: 18px;
+  color: gray;
+  margin: 20px 0;
+}

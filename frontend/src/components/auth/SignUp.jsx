@@ -1,7 +1,7 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import { Form, Button, Container, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
-import './signUp.css'
+import './signUp.css';
 import axios from 'axios';
 
 function SignUp() {
@@ -9,9 +9,10 @@ function SignUp() {
   const [fullName, setFullName] = useState('');
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
-  const [submitting, setSubmitting] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('user'); // New state for role selection
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [accountCreated, setAccountCreated] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -23,7 +24,7 @@ function SignUp() {
     if (!fullName.trim()) {
       formErrors.fullName = "Full Name is required.";
     }
-    
+
     if (!userName.trim()) {
       formErrors.userName = "Username is required.";
     }
@@ -33,7 +34,7 @@ function SignUp() {
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       formErrors.email = "Email address is invalid.";
     }
-    
+
     if (!password.trim()) {
       formErrors.password = "Password is required.";
     } else if (password.length < 6) {
@@ -50,7 +51,7 @@ function SignUp() {
   const handleCreateAccount = async (e) => {
     const formErrors = validateForm();
     e.preventDefault();
-    
+
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
     } else {
@@ -64,19 +65,22 @@ function SignUp() {
           username: userName,
           email: email,
           password: password,
+          role: role, // Include role in the user data
         };
+
         const response = await axios.post(
-          'http://localhost:5000/api/v1/users/signup', userData,
+          'http://localhost:5000/api/v1/users/signup',
+          userData,
           {
             headers: {
               'Content-Type': 'application/json',
             },
           }
-        );        
+        );
 
         if (response.status === 201) {
           setAccountCreated(true);
-          setEmailSent(true);  // Indicates email verification was sent
+          setEmailSent(true); // Indicates email verification was sent
           setTimeout(() => {
             navigate(`/verify-email?email=${encodeURIComponent(email)}`);
           }, 3000);
@@ -87,7 +91,7 @@ function SignUp() {
           setApiError(error.response.data.error);
         } else {
           setApiError('An error occurred. Please try again.');
-        } 
+        }
       } finally {
         setSubmitting(false);
       }
@@ -112,9 +116,7 @@ function SignUp() {
         )}
 
         {apiError && (
-          <Alert variant="danger">
-            {apiError}
-          </Alert>
+          <Alert variant="danger">{apiError}</Alert>
         )}
 
         <Form onSubmit={handleCreateAccount}>
@@ -183,14 +185,27 @@ function SignUp() {
             </Form.Control.Feedback>
           </Form.Group>
 
+          {/* New Role Selection Section */}
+          <Form.Group className="mb-3" controlId="formRole">
+            <Form.Label>Select Role</Form.Label>
+            <Form.Select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              isInvalid={!!errors.role}
+            >
+              <option value="user">User</option>
+              <option value="contributor">Contributor</option>
+            </Form.Select>
+          </Form.Group>
+
           <Button type="submit" disabled={submitting} variant="primary">
             {submitting ? <Spinner size="sm" animation="border" /> : 'Create Account'}
           </Button>
         </Form>
 
         <p className="mt-3">
-        Already have an account? <Link to="/login">Sign in</Link>
-      </p>
+          Already have an account? <Link to="/login">Sign in</Link>
+        </p>
 
         <p className="mt-3">
           By signing up, you agree to our{' '}
