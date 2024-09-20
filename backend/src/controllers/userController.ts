@@ -23,7 +23,8 @@ export const getProfile = async (req: Request, res: Response): Promise<Response>
       email: user.email,
       role: user.role,
       profilePic: profilePicUrl,  // Full URL for the profile picture
-      isVerified: user.isVerified
+      isVerified: user.isVerified,
+      activityHistory: user.activityHistory
     });
   } catch (error) {
     if (error instanceof Error) {

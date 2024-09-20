@@ -100,23 +100,45 @@ export const updatePost = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Visitors can view posts
+// Visitors can view post
+
 export const getPosts = async (req: Request, res: Response): Promise<void> => {
   try {
+    // Parse the page and limit query parameters, set defaults if not provided
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    // Calculate the number of posts to skip for pagination
+    const skip = (page - 1) * limit;
+
+    // Fetch the total number of posts
+    const totalPosts = await Post.countDocuments();
+
+    // Find the posts with pagination, and populate related data
     const posts = await Post.find()
       .populate('author', 'username')
-      .populate('comments');
-    
+      .populate('comments')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // Optionally sort posts by creation date (latest first)
+
     // Generate the base URL for the banner images
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    
+
     // Map through posts to construct the full URL for each banner image
     const postsWithFullBannerUrls = posts.map(post => ({
       ...post.toObject(),
       banner: post.banner ? `${baseUrl}/${post.banner}` : null
     }));
-    
-    res.status(200).json(postsWithFullBannerUrls);
+
+    // Send the paginated data along with meta information
+    res.status(200).json({
+      currentPage: page,
+      totalPages: Math.ceil(totalPosts / limit),
+      totalPosts,
+      hasMore: page * limit < totalPosts, // Check if there are more posts to load
+      posts: postsWithFullBannerUrls
+    });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
