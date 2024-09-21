@@ -87,7 +87,11 @@ export const updateProfilePic = async (req, res) => {
             // Save the profile picture
             user.profilePic = `/uploads/profile-pics/${req.file?.filename}`;
             await user.save();
-            return res.json(user);
+            // Generate the base URL for the profilePic image
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            // Construct the full URL for the profilePic image if it exists
+            const profilePicUrl = user.profilePic ? `${baseUrl}${user.profilePic}` : null;
+            return res.json({ profilePic: profilePicUrl });
         }
         catch (error) {
             return res.status(500).json({ error: 'Server error' });

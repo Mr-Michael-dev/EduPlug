@@ -23,6 +23,6 @@ const postSchema = new Schema<IPost>({
 }, { timestamps: true });
 
 // Create text index for search functionality
-postSchema.index({ title: 'text', content: 'text' });
+postSchema.index({ title: 'text', content: 'text', _id: 'text' });
 
 export const Post = mongoose.model<IPost>('Post', postSchema);

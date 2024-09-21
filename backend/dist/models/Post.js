@@ -9,5 +9,5 @@ const postSchema = new Schema({
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
 }, { timestamps: true });
 // Create text index for search functionality
-postSchema.index({ title: 'text', content: 'text' });
+postSchema.index({ title: 'text', content: 'text', _id: 'text' });
 export const Post = mongoose.model('Post', postSchema);

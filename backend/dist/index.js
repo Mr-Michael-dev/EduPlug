@@ -28,7 +28,8 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 // Middleware to handle static file (photo)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+console.log('Serving uploads from:', path.join(__dirname, '..', 'uploads'));
 // Middleware and routes setup
 app.use('/api/v1/comments', commentRouter);
 app.use('/api/v1/posts', postRouter);

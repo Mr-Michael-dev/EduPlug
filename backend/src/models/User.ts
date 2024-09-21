@@ -6,7 +6,7 @@ export interface IUser extends Document {
   username: string;
   email: string;
   password: string;
-  role: 'admin' | 'contributor' | 'visitor';
+  role: 'admin' | 'contributor' | 'user';
   profilePic: string | null;
   isVerified: boolean;
   activityHistory: Array<{ action: string; postId: mongoose.Types.ObjectId; timestamp: Date }>;
@@ -18,7 +18,7 @@ const userSchema = new Schema<IUser>({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'contributor', 'visitor'], default: 'visitor' },
+  role: { type: String, enum: ['admin', 'contributor', 'user'], default: 'user' },
   profilePic: { type: String, default: '' },
   isVerified: { type: Boolean, default: false },
   activityHistory: [{

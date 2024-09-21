@@ -7,6 +7,8 @@ export const createPost = async (req, res) => {
         if (err) {
             return res.status(400).json({ error: err.message });
         }
+        // Check if the post creation code runs only once
+        console.log('Creating post...');
         // Fixed the condition for checking user role
         if (req.user?.role !== 'contributor' && req.user?.role !== 'admin') {
             return res.status(403).json({ error: 'Only contributors or admins can create posts' });
@@ -16,7 +18,7 @@ export const createPost = async (req, res) => {
             const post = new Post({
                 title,
                 content,
-                banner: `/uploads/post-banners/${req.file?.filename}`,
+                banner: `uploads/post-banners/${req.file?.filename}`,
                 author: req.user._id
             });
             await post.save();
@@ -53,7 +55,7 @@ export const getPostById = async (req, res) => {
         // Generate the base URL for the banner image
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         // Construct the full URL for the banner image if it exists
-        const bannerUrl = post.banner ? `${baseUrl}/${post.banner}` : null;
+        const bannerUrl = post.banner ? `${baseUrl}${post.banner}` : null;
         // Return the post with the full banner URL
         res.json({
             ...post.toObject(),
@@ -97,7 +99,7 @@ export const getPosts = async (req, res) => {
         const totalPosts = await Post.countDocuments();
         // Find the posts with pagination, and populate related data
         const posts = await Post.find()
-            .populate('author', 'username')
+            .populate('author', 'username profilePic')
             .populate('comments')
             .skip(skip)
             .limit(limit)
@@ -105,10 +107,14 @@ export const getPosts = async (req, res) => {
         // Generate the base URL for the banner images
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         // Map through posts to construct the full URL for each banner image
-        const postsWithFullBannerUrls = posts.map(post => ({
-            ...post.toObject(),
-            banner: post.banner ? `${baseUrl}/${post.banner}` : null
-        }));
+        const postsWithFullBannerUrls = posts.map(post => {
+            const bannerUrl = post.banner ? `${baseUrl}${post.banner}` : null;
+            console.log(`Post ID: ${post._id}, Banner URL: ${bannerUrl}`);
+            return {
+                ...post.toObject(),
+                banner: bannerUrl
+            };
+        });
         // Send the paginated data along with meta information
         res.status(200).json({
             currentPage: page,
