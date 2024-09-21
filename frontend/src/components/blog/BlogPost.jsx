@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'; // for retrieving the post ID from
 import axios from 'axios'; // for making API calls
 import { Container, Row, Col, Image, Card, Spinner } from 'react-bootstrap';
 import { FaEye } from 'react-icons/fa'; // For the eye icon next to the view count
+import profilePic from '../../assets/profilePic.webp';
 
 const BlogPost = () => {
   const { id } = useParams(); // Get post ID from route params
@@ -14,7 +15,7 @@ const BlogPost = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`/api/v1/posts/${id}`);
+        const response = await axios.get(`http://localhost:5000/api/v1/posts/${id}`);
         setPost(response.data);
         setLoading(false);
       } catch (err) {
@@ -45,7 +46,7 @@ const BlogPost = () => {
 
   // Show the blog post content once the data is available
   return (
-    <Container className="my-5">
+    <Container className="my-5" style={{ minHeight: '70vh' }}>
       <Row>
         <Col md={8} className="mx-auto">
           {/* Blog post banner image */}
@@ -66,7 +67,7 @@ const BlogPost = () => {
               {/* Author and views */}
               <div className="d-flex align-items-center mb-3 text-muted">
                 <Image 
-                  src="https://via.placeholder.com/40" // Replace with actual author avatar if available
+                  src={post.author.profilePic || profilePic}// Replace with actual author avatar if available
                   roundedCircle 
                   width={40} 
                   height={40} 
@@ -74,8 +75,8 @@ const BlogPost = () => {
                   alt="Author"
                 />
                 <div>
-                  <small className="me-2">{post.author?.name || 'Unknown Author'}</small>
-                  <small>/ {new Date(post.createdAt).toLocaleDateString()}</small>
+                  <small className="me-2"><strong>@{post.author?.username || 'Unknown Author'}</strong></small>
+                  <small>| {new Date(post.createdAt).toLocaleDateString()}</small>
                 </div>
                 <div className="ms-auto">
                   <FaEye className="me-1" /> {/* Replace with view count if available */}
@@ -86,8 +87,6 @@ const BlogPost = () => {
               {/* Blog content */}
               <Card.Text as="div">
                 <p>{post.content}</p>
-
-                <h5>Tags</h5>
                 <ul>
                   {post.tags.map((tag, index) => (
                     <li key={index}>{tag}</li>

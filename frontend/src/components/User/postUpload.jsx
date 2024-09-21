@@ -33,6 +33,7 @@ function PostUpload() {
   };
 
   const handlePost = async () => {
+
     if (!postTitle || !postText || !postBanner) {
       setError('Please fill all fields and upload a banner.');
       return;
@@ -44,7 +45,7 @@ function PostUpload() {
     formData.append('banner', postBanner);  // Upload the banner image
 
     try {
-      const response = await axios.post('/api/v1/create-post', formData, {
+      const response = await axios.post('http://localhost:5000/api/v1/posts', formData, {
         withCredentials: true,  // Include cookies for authentication
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -69,7 +70,7 @@ function PostUpload() {
       {error && <div className="alert alert-danger">{error}</div>}
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
 
-      <Form>
+      <Form >
         {/* Post Banner Upload */}
         <Form.Group controlId="formFileBanner" className="mb-4">
           <Form.Label>Upload Banner Image</Form.Label>

@@ -16,10 +16,14 @@ const useFetchPosts = (page = 1, limit = 10) => {
         if (response.status !== 200) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
+  
         const newPosts = response.data.posts || [];
-        setPosts((prevPosts) => [...prevPosts, ...newPosts]);
-
+        setPosts((prevPosts) => {
+          const postIds = new Set(prevPosts.map(post => post._id));
+          const newUniquePosts = newPosts.filter(post => !postIds.has(post._id));
+          return [...prevPosts, ...newUniquePosts];
+        });        
+  
         // Set hasMore to false if no new posts are returned
         if (newPosts.length < limit) {
           setHasMore(false);

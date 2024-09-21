@@ -4,6 +4,7 @@ import { Button, Form, Container, Row, Col, Image, Spinner } from 'react-bootstr
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import Logout from '../auth/Logout';
+import profilePic from '../../assets/profilePic.webp';
 
 function Profile() {
   const [profile, setProfile] = useState(null);
@@ -32,16 +33,24 @@ function Profile() {
   const handleUpload = async () => {
     const formData = new FormData();
     formData.append('profilePic', selectedFile);
-
+  
     try {
-      const res = await axios.put('/api/v1/users/profile/profile-pic', formData, { withCredentials: true });
+      const res = await axios.put('http://localhost:5000/api/v1/users/profile/profile-pic', formData, { withCredentials: true });
+      
+      // Assuming the response returns the complete user object
+      setProfile(prevProfile => ({
+        ...prevProfile,
+        profilePic: res.data.profilePic // Update only the profilePic
+      }));
+      
       setMessage('Profile picture updated successfully.');
-      setProfile(res.data);  // Update profile with the new picture
+      console.log(profile);
     } catch (error) {
       setMessage('Error uploading profile picture.');
+      console.error(error); // Log the error for debugging
     }
   };
-
+  
   if (loading) {
     // Show loading spinner while fetching data
     return (
@@ -57,14 +66,14 @@ function Profile() {
     <Container>
       {profile && (
         <div>
-          <h1 className="mt-4">{profile.fullname}'s Profile</h1>
+          <h1 className="mt-4">{profile.fullname}</h1>
           <Row className="align-items-center">
             <Col md={4} className="text-center">
               <Image
-                src={profile.profilePic || '../../assets/profilePic.webp'}
+                src={profile.profilePic || profilePic}
                 roundedCircle
-                width="150"
-                height="150"
+                width="250"
+                height="200"
                 className="mb-3"
               />
               <Form.Group controlId="formFile" className="mb-3">
@@ -75,9 +84,9 @@ function Profile() {
               </Button>
               {message && <p className="mt-2">{message}</p>}
             </Col>
-            <Col md={8}>
+            <Col md={8} className='my-3'>
               <h5>Profile Information</h5>
-              <p><strong>Username:</strong> {profile.username}</p>
+              <p><strong>Username:</strong> @{profile.username}</p>
               <p><strong>Email:</strong> {profile.email}</p>
               <p><strong>Role:</strong> {profile.role}</p>
               <p><strong>Status:</strong> {profile.isVerified ? 'Verified' : 'Not Verified'}</p>

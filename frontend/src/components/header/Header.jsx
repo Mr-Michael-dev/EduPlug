@@ -50,12 +50,14 @@ function Header() {
                   }
                   id="user-nav-dropdown"
                 >
-                  <NavDropdown.Item href="/profile">{user.username}</NavDropdown.Item>
-                  <NavDropdown.Item>
-                    <Logout />
-                  </NavDropdown.Item>
-
+                  <NavDropdown.Item href="/profile">@{user.username}</NavDropdown.Item>
+                  <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
+                  <div >
+                    <Logout className="custom-logout-btn" />
+                  </div>
                 </NavDropdown>
+
+
                 {/* Render Create Post button for admins or contributors */}
                 {(user.role === 'admin' || user.role === 'contributor') && (
                   <Button variant="outline-info" onClick={() => navigate('/create-post')}>

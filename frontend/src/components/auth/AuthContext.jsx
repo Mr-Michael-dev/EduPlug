@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // Create the context
 const AuthContext = createContext();
@@ -41,7 +42,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Redirect to admin dashboard if user is an admin
     if (isAdmin && isAuthenticated) {
-      navigate('/admin-dashboard');
+      navigate('/admins/admin-dashboard');
     }
   }, [isAdmin, isAuthenticated, navigate]);
 

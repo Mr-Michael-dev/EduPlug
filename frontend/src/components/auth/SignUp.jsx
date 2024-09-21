@@ -11,7 +11,7 @@ function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('user'); // New state for role selection
+  const [role, setRole] = useState('Register as'); // New state for role selection
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [accountCreated, setAccountCreated] = useState(false);
@@ -187,12 +187,12 @@ function SignUp() {
 
           {/* New Role Selection Section */}
           <Form.Group className="mb-3" controlId="formRole">
-            <Form.Label>Select Role</Form.Label>
             <Form.Select
               value={role}
               onChange={(e) => setRole(e.target.value)}
               isInvalid={!!errors.role}
             >
+              <option value="">Register as</option>
               <option value="user">User</option>
               <option value="contributor">Contributor</option>
             </Form.Select>

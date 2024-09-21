@@ -9,8 +9,10 @@ import carousel_2 from '../../assets/carousel_2.png';
 import carousel_3 from '../../assets/carousel_3.png';
 import './home.css';
 import useFetchPosts from '../../hooks/UseFetchPosts';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const navigate = useNavigate();
   const { posts, loading, error } = useFetchPosts(1, 10); // Fetch only the first 10 latest posts
 
   // Dummy array for showing loading cards
@@ -26,7 +28,7 @@ const Home = () => {
             <Carousel.Caption>
               <h3>Welcome to EduPlug</h3>
               <p>We plug learners to knowledge</p>
-              <Button variant="primary">Read More</Button>
+              <Button variant="primary" onClick={() => navigate('/aboutUs')}>Read More</Button>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
@@ -34,7 +36,7 @@ const Home = () => {
             <Carousel.Caption>
               <h3>Educational Resources</h3>
               <p>Discover insightful articles and stories.</p>
-              <Button variant="primary">Read More</Button>
+              <Button variant="primary" onClick={() => navigate('/aboutUs')}>Read More</Button>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
@@ -42,7 +44,7 @@ const Home = () => {
             <Carousel.Caption>
               <h3>Serving you knowledge</h3>
               <p>We sponsor purely educational contents, articles, news ....</p>
-              <Button variant="primary">Read More</Button>
+              <Button variant="primary" onClick={() => navigate('/aboutUs')}>Read More</Button>
             </Carousel.Caption>
           </Carousel.Item>
         </Carousel>
@@ -65,7 +67,7 @@ const Home = () => {
                       title={post.title}
                       imageUrl={post.banner}
                       description="Click to read this post."
-                      postUrl={`/post/${post._id}`}
+                      postUrl={`/blogs/${post._id}`}
                       buttonText="Read More"
                     />
                   </Col>
@@ -82,11 +84,11 @@ const Home = () => {
             ? dummyArray.map((_, index) => <LoadingPost key={index} />) // Display loading posts
             : posts.map((post) => (
                 <LatestPost
-                  key={post._id}
+                  key={post._id} // Ensure key is based on post._id
                   title={post.title}
-                  author={post.author}
+                  author={post.author?.username || 'Unknown'} // Handle cases where author might not be available
                   datePosted={new Date(post.createdAt).toLocaleDateString()}
-                  postUrl={`/post/${post._id}`}
+                  postUrl={`/blogs/${post._id}`}
                   likes={post.likes.length}
                   comments={post.comments.length}
                 />

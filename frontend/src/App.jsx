@@ -23,37 +23,38 @@ import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
     <Router>
-      <>
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/admins/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/admins/signup" element={<AdminSignUp />} />
-          <Route path="/aboutUs" element={<AboutUs />} />
-          <Route path="/verify-email" element={<EmailVerification />} />
-          <Route path="/admins/verify-email" element={<EmailVerification />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-of-use" element={<TermsOfUse />} />
-          <Route path="/code-of-conduct" element={<CodeOfConduct />} />
-          {/* New Routes for Blog and BlogPost */}
-          <Route path="/blogs" element={<Blog />} /> {/* View all posts */}
-          <Route path="/blog/:id" element={<BlogPost />} /> {/* View single post */}
-          {/* Protected routes */}
-          <Route element={<PrivateRoute />}>
-          <Route path="/create-post" element={<PostUpload />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          </Route>
-        </Routes>
-        <Footer />
-      </>
+      <AuthProvider>
+        <>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/admins/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/admins/signup" element={<AdminSignUp />} />
+            <Route path="/aboutUs" element={<AboutUs />} />
+            <Route path="/verify-email" element={<EmailVerification />} />
+            <Route path="/admins/verify-email" element={<EmailVerification />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-use" element={<TermsOfUse />} />
+            <Route path="/code-of-conduct" element={<CodeOfConduct />} />
+            {/* New Routes for Blog and BlogPost */}
+            <Route path="/blogs" element={<Blog />} /> {/* View all posts */}
+            <Route path="/blogs/:id" element={<BlogPost />} /> {/* View single post */}
+            {/* Protected routes */}
+            <Route element={<PrivateRoute />}>
+              <Route path="/create-post" element={<PostUpload />} />
+              <Route path="/admins/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
+          </Routes>
+          <Footer />
+        </>
+      </AuthProvider>
     </Router>
-    </AuthProvider>
   );
 }
+
 
 export default App;

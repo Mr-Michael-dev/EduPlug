@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../auth/AuthContext';
 import { Container, Table, Button, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -25,7 +25,12 @@ function AdminDashboard() {
   }, [isAuthenticated, isAdmin, loading, navigate, user]);
 
   if (loading) {
-    return <div>Loading...</div>; // Show a loading indicator while fetching auth state
+    return (
+      <div>
+        <Spinner animation="border" variant="primary" style={{ width: '5rem', height: '5rem' }} />
+        <p>Loading...</p>
+      </div>
+    ); // Show a loading indicator while fetching auth state
   }
 
   useEffect(() => {

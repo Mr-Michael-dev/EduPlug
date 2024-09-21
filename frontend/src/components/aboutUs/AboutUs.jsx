@@ -1,8 +1,30 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Container } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Spinner } from 'react-bootstrap';
 
 const AboutUs = () => {
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    
+    // Simulate fetching data from an API
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    // Cleanup timer when component unmounts
+    return () => clearTimeout(timer);
+  }, []); // Empty dependency array means this runs once when the component mounts
+
+  if (loading) {
+    return (
+      <div className='my-3'>
+        <Spinner animation="border" variant="primary" style={{ width: '5rem', height: '5rem' }} />
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <Container className="mt-5">
       <h1>About EduPlug</h1>
