@@ -35,7 +35,7 @@ function Profile() {
     formData.append('profilePic', selectedFile);
   
     try {
-      const res = await axios.put('http://localhost:5000/api/v1/users/profile/profile-pic', formData, { withCredentials: true });
+      const res = await axios.put('/api/v1/users/profile/profile-pic', formData, { withCredentials: true });
       
       // Assuming the response returns the complete user object
       setProfile(prevProfile => ({

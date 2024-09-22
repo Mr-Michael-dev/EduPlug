@@ -12,7 +12,7 @@ const useFetchPosts = (page = 1, limit = 10) => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/v1/posts?page=${page}&limit=${limit}`);
+        const response = await axios.get(`/api/v1/posts?page=${page}&limit=${limit}`);
         if (response.status !== 200) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

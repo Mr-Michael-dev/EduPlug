@@ -15,6 +15,7 @@ function PostCard({ post, isAdmin = false, onDelete }) {
   const [comments, setComments] = useState(post.comments || []);
   const [commentText, setCommentText] = useState('');
 
+
   const handleLike = async () => {
     try {
       const updatedLikes = await likePost(token, post.id);

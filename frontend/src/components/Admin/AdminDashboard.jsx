@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { Container, Table, Button, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import useFetchPosts from '../../hooks/UseFetchPosts';
 import axios from 'axios';
 
 function AdminDashboard() {
-  const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(1); // Initialize page state for pagination
+  const { posts } = useFetchPosts(page, 20); // Fetch 20 posts per page
   const [users, setUsers] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -14,6 +16,27 @@ function AdminDashboard() {
   const [newPost, setNewPost] = useState({ title: '', content: '' });
   const { user, isAdmin, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1); // Load next page when the loader is visible
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (loader.current) {
+      observer.observe(loader.current);
+    }
+
+    return () => {
+      if (loader.current) {
+        observer.unobserve(loader.current);
+      }
+    };
+  }, [hasMore]);
 
   // Redirect non-admin users
   useEffect(() => {
@@ -33,9 +56,7 @@ function AdminDashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const postsResponse = await axios.get('http://localhost:5000/api/v1/posts?page=1&limit=50');
-      const usersResponse = await axios.get('http://localhost:5000/api/v1/users/allUsers', {}, { withCredentials: true });
-      setPosts(postsResponse.data);
+      const usersResponse = await axios.get('/api/v1/users/allUsers', {}, { withCredentials: true });
       setUsers(usersResponse.data);
     };
 
@@ -45,7 +66,7 @@ function AdminDashboard() {
   // Handle Delete Post
   const handleDeletePost = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/posts/${selectedPost._id}`,  {}, { withCredentials: true });
+      await axios.delete(`/api/posts/${selectedPost._id}`,  {}, { withCredentials: true });
       setPosts(posts.filter(post => post._id !== selectedPost._id));
       setShowDeleteModal(false);
     } catch (error) {
@@ -56,7 +77,7 @@ function AdminDashboard() {
   // Handle Delete User
   const handleDeleteUser = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/users/profile/${selectedUser._id}`,  {}, { withCredentials: true });
+      await axios.delete(`/api/users/profile/${selectedUser._id}`,  {}, { withCredentials: true });
       setUsers(users.filter(user => user._id !== selectedUser._id));
       setShowDeleteModal(false);
     } catch (error) {
@@ -68,7 +89,7 @@ function AdminDashboard() {
   const handleCreatePost = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/posts', newPost, { withCredentials: true });
+      const response = await axios.post('/api/posts', newPost, { withCredentials: true });
       setPosts([...posts, response.data]);
       setNewPost({ title: '', content: '' });
       setShowCreatePostModal(false);

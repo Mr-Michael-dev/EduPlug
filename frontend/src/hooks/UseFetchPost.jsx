@@ -22,7 +22,7 @@ const useFetchPost = (postId) => {
     const fetchPost = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/posts/${postId}`); // replace with actual API endpoint
+        const response = await axios.get(`/api/posts/${postId}`); // replace with actual API endpoint
         setPost(response.data);
       } catch (err) {
         setError(err);

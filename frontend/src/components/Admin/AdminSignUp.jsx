@@ -74,7 +74,7 @@ function AdminSignUp() {
         }; 
   
         const response = await axios.post( 
-          'http://localhost:5000/api/v1/admins/signup', 
+          '/api/v1/admins/signup', 
           adminData, 
           { headers: { 'Content-Type': 'application/json' } } 
         ); 
