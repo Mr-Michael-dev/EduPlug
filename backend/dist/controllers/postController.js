@@ -7,8 +7,6 @@ export const createPost = async (req, res) => {
         if (err) {
             return res.status(400).json({ error: err.message });
         }
-        // Check if the post creation code runs only once
-        console.log('Creating post...');
         // Fixed the condition for checking user role
         if (req.user?.role !== 'contributor' && req.user?.role !== 'admin') {
             return res.status(403).json({ error: 'Only contributors or admins can create posts' });
@@ -18,7 +16,7 @@ export const createPost = async (req, res) => {
             const post = new Post({
                 title,
                 content,
-                banner: `uploads/post-banners/${req.file?.filename}`,
+                banner: `/uploads/post-banners/${req.file?.filename}`,
                 author: req.user._id
             });
             await post.save();
@@ -108,11 +106,12 @@ export const getPosts = async (req, res) => {
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         // Map through posts to construct the full URL for each banner image
         const postsWithFullBannerUrls = posts.map(post => {
+            const profilePicUrl = post.author?.profilePic ? `${baseUrl}${post.author.profilePic}` : null;
             const bannerUrl = post.banner ? `${baseUrl}${post.banner}` : null;
-            console.log(`Post ID: ${post._id}, Banner URL: ${bannerUrl}`);
             return {
                 ...post.toObject(),
-                banner: bannerUrl
+                banner: bannerUrl,
+                author: { profilePic: profilePicUrl }
             };
         });
         // Send the paginated data along with meta information

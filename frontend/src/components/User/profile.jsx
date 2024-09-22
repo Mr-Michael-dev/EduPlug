@@ -72,8 +72,9 @@ function Profile() {
               <Image
                 src={profile.profilePic || profilePic}
                 roundedCircle
-                width="250"
-                height="200"
+                width="150"
+                height="150"
+                style={{ objectFit: 'cover' }} 
                 className="mb-3"
               />
               <Form.Group controlId="formFile" className="mb-3">

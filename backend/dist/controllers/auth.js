@@ -5,6 +5,12 @@ import { generateToken, hashPassword, random } from '../utils/index.js';
 import redisClient from '../db/redis.js'; // Redis redisClient
 import nodemailer from 'nodemailer'; // For sending verification emails
 import { MongoError } from 'mongodb';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+// Get __filename and __dirname in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // Register a new user
 export const register = async (req, res) => {
     const { fullname, username, email, password, role } = req.body;
@@ -19,11 +25,16 @@ export const register = async (req, res) => {
         const verificationCode = random();
         // Store verification code in Redis with an expiration time
         await redisClient.set(lowerCaseEmail, verificationCode, 1800);
+        // Construct the full path to the image in the public folder
+        const imageFilePath = path.join(__dirname, '../../public/eduplug_logo_1_copy.png');
+        // Convert the image to Base64
+        const imageBase64 = fs.readFileSync(imageFilePath, 'base64');
+        const base64Logo = `data:image/png;base64,${imageBase64}`;
         const verificationLink = `http://localhost:5173/verify-email?token=${verificationCode}&email=${encodeURIComponent(lowerCaseEmail)}`;
         const htmlBody = `
       <div style="font-family: Arial, sans-serif; color: #333;">
         <div style="text-align: center;">
-          <img src="./eduplug_logo_1_copy.png" alt="EduPlug Logo" style="width: 150px;"/>
+          <img src="${base64Logo}" alt="EduPlug Logo" style="width: 150px;"/>
         </div>
         <h2 style="text-align: center;">Welcome to EduPlug!</h2>
         <p>Hi <strong>${fullname}</strong>,</p>
@@ -175,5 +186,17 @@ export const logout = async (req, res) => {
 };
 // check authentication for users
 export const checkAuth = async (req, res) => {
-    return res.status(200).json({ message: 'Authenticated', user: req.user });
+    if (req.user) {
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const profilePicUrl = req.user.profilePic ? `${baseUrl}${req.user.profilePic}` : null;
+        // Return the user object with full profilePic URL
+        return res.status(200).json({
+            message: 'Authenticated',
+            user: {
+                ...req.user.toObject(),
+                profilePic: profilePicUrl // Ensure full URL is returned
+            }
+        });
+    }
+    return res.status(401).json({ message: 'Not authenticated' });
 };

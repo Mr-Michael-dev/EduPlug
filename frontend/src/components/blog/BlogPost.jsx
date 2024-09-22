@@ -4,6 +4,7 @@ import axios from 'axios'; // for making API calls
 import { Container, Row, Col, Image, Card, Spinner } from 'react-bootstrap';
 import { FaEye } from 'react-icons/fa'; // For the eye icon next to the view count
 import profilePic from '../../assets/profilePic.webp';
+import './blogPost.css'
 
 const BlogPost = () => {
   const { id } = useParams(); // Get post ID from route params
@@ -84,9 +85,9 @@ const BlogPost = () => {
                 </div>
               </div>
 
-              {/* Blog content */}
-              <Card.Text as="div">
-                <p>{post.content}</p>
+              {/* Blog content - Render HTML safely */}
+              <Card.Text as="div" style={{ textAlign: 'left' }}>
+                <div dangerouslySetInnerHTML={{ __html: post.content }} />
                 <ul>
                   {post.tags.map((tag, index) => (
                     <li key={index}>{tag}</li>

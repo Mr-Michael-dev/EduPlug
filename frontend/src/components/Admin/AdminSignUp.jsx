@@ -191,7 +191,7 @@ function AdminSignUp() {
           {/* Token Field */} 
           <Form.Group className="mb-3" controlId="formToken"> 
             <Form.Control 
-              type="text" 
+              type="password" 
               placeholder="Admin Token" 
               value={token} 
               onChange={(e) => setToken(e.target.value)} 

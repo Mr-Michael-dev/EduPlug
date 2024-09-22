@@ -5,6 +5,43 @@ import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User.js';
 import { fileUploader } from '../utils/upload.js';
 
+
+// get all users from the database
+export const getAllUsers = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    // Fetch all users from the database
+    const users = await User.find();
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: 'No users found' });
+    }
+
+    // Generate the base URL for profile pictures
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    // Map through the users to construct full URLs for profile pictures
+    const usersWithProfilePic = users.map(user => ({
+      _id: user._id,
+      fullname: user.fullname,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      profilePic: user.profilePic ? `${baseUrl}${user.profilePic}` : null, // Full URL for the profile picture
+      isVerified: user.isVerified,
+      activityHistory: user.activityHistory
+    }));
+
+    // Return the list of users with profile picture URLs
+    return res.json(usersWithProfilePic);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: 'Server error' });
+    } else {
+      return res.status(500).json({ error: 'Unknown error occurred' });
+    }
+  }
+};
+
+
 // Get user profile
 export const getProfile = async (req: Request, res: Response): Promise<Response> => {
   try {

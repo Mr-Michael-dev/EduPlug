@@ -19,8 +19,6 @@ function AdminDashboard() {
   useEffect(() => {
     if (!loading && (!isAuthenticated || !isAdmin)) {
       navigate('/'); // Redirect to the homepage or a login page if not admin
-    } else {
-      setUsers(user);
     }
   }, [isAuthenticated, isAdmin, loading, navigate, user]);
 
@@ -35,8 +33,8 @@ function AdminDashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const postsResponse = await axios.get('/api/v1/posts');
-      const usersResponse = await axios.get('/api/v1/users');
+      const postsResponse = await axios.get('http://localhost:5000/api/v1/posts?page=1&limit=50');
+      const usersResponse = await axios.get('http://localhost:5000/api/v1/users/allUsers', {}, { withCredentials: true });
       setPosts(postsResponse.data);
       setUsers(usersResponse.data);
     };
@@ -47,7 +45,7 @@ function AdminDashboard() {
   // Handle Delete Post
   const handleDeletePost = async () => {
     try {
-      await axios.delete(`/api/posts/${selectedPost._id}`);
+      await axios.delete(`http://localhost:5000/api/posts/${selectedPost._id}`,  {}, { withCredentials: true });
       setPosts(posts.filter(post => post._id !== selectedPost._id));
       setShowDeleteModal(false);
     } catch (error) {
@@ -58,7 +56,7 @@ function AdminDashboard() {
   // Handle Delete User
   const handleDeleteUser = async () => {
     try {
-      await axios.delete(`/api/users/${selectedUser._id}`);
+      await axios.delete(`http://localhost:5000/api/users/profile/${selectedUser._id}`,  {}, { withCredentials: true });
       setUsers(users.filter(user => user._id !== selectedUser._id));
       setShowDeleteModal(false);
     } catch (error) {
@@ -70,7 +68,7 @@ function AdminDashboard() {
   const handleCreatePost = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/posts', newPost);
+      const response = await axios.post('http://localhost:5000/api/posts', newPost, { withCredentials: true });
       setPosts([...posts, response.data]);
       setNewPost({ title: '', content: '' });
       setShowCreatePostModal(false);

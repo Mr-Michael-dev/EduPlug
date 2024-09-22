@@ -4,8 +4,9 @@ import {
     login,
     logout,
     verifyEmail,
-    checkAuth
+    checkAuth,
 } from '../controllers/auth.js';
+import { getAllUsers } from '../controllers/userController.js';
 import { protect } from '../middleware/auth.js';
 import { getProfile, updateProfile, updateProfilePic, deleteProfile, getActivityHistory } from '../controllers/userController.js';
 
@@ -16,7 +17,8 @@ router.post('/verify-email', verifyEmail);
 router.post('/login', login);
 router.post('/logout', logout);
 router.post('/check-auth', protect, checkAuth);
-router.get('/profile', protect, getProfile); 
+router.get('/allUsers', protect, getAllUsers);
+router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfile);
 router.put('/profile/profile-pic', protect, updateProfilePic);
 router.delete('/profile/:id', protect, deleteProfile);
