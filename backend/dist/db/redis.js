@@ -1,20 +1,16 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 // module contains a class RedisClient that defines
 // a connection to redisClient and a set and get method
+<<<<<<< HEAD
 const redis_1 = require("redis");
 class RedisClient {
     constructor() {
         this.client = (0, redis_1.createClient)({
+=======
+import { createClient } from 'redis';
+class RedisClient {
+    constructor() {
+        this.client = createClient({
+>>>>>>> cd32b3d41311f94055d682a69f4e811433c89121
             url: process.env.REDIS_URL || 'redis://localhost:6379'
         });
         this.client.on('error', (err) => {
@@ -24,6 +20,7 @@ class RedisClient {
             console.error('Redis connection error:', err);
         });
     }
+<<<<<<< HEAD
     isAlive() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -68,7 +65,45 @@ class RedisClient {
                 console.error(`Error deleting key ${key}:`, err);
             }
         });
+=======
+    async isAlive() {
+        try {
+            await this.client.ping(); // Await the ping operation
+            return true;
+        }
+        catch (err) {
+            console.error('Ping error:', err);
+            return false;
+        }
+    }
+    async get(key) {
+        try {
+            const value = await this.client.get(key);
+            return value;
+        }
+        catch (err) {
+            console.error(`Error getting key ${key}:`, err);
+            return null;
+        }
+    }
+    async set(key, value, duration) {
+        try {
+            await this.client.set(key, value);
+            await this.client.expire(key, duration);
+        }
+        catch (err) {
+            console.error(`Error setting key ${key}:`, err);
+        }
+    }
+    async del(key) {
+        try {
+            await this.client.del(key);
+        }
+        catch (err) {
+            console.error(`Error deleting key ${key}:`, err);
+        }
+>>>>>>> cd32b3d41311f94055d682a69f4e811433c89121
     }
 }
 const redisClient = new RedisClient();
-exports.default = redisClient;
+export default redisClient;

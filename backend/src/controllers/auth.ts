@@ -1,46 +1,75 @@
 /// <reference types="express" />
-/// <reference path="../types/express/express.d.ts" />
+/// <reference path="../../express.d.ts" />
+
 
 import { Request, Response, NextFunction } from 'express'; 
-import { User } from '../models/User';
-import { generateToken, hashPassword, random } from '../helpers';
-import redisClient from '../db/redis'; // Redis redisClient
+import { User } from '../models/User.js';
+import { generateToken, hashPassword, random } from '../utils/index.js';
+import redisClient from '../db/redis.js'; // Redis redisClient
 import nodemailer from 'nodemailer'; // For sending verification emails
-import jwt from 'jsonwebtoken';
+import { MongoError } from 'mongodb';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Middleware for protecting routes
-export const protect = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  let token = req.headers.authorization?.split(' ')[1];
-  if (!token) {
-    res.status(401).json({ error: 'Not authorized' });
-    return;
-  }
+// Get __filename and __dirname in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'CLETA-REST-API') as { id: string; role: string };
-    req.user = await User.findById(decoded.id).select('-password');
-    next();
-  } catch (error) {
-    res.status(401).json({ error: 'Not authorized, token failed' });
-  }
-};
+interface RequestType {
+  fullname: string;
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+  token: string;
+}
 
 // Register a new user
-export const register = async (req: Request, res: Response): Promise<Response> => {
+export const register = async (req: Request<{}, {}, RequestType>, res: Response): Promise<Response> => {
   const { fullname, username, email, password, role } = req.body;
+
+  const lowerCaseEmail = email.toLowerCase()
+  console.log(lowerCaseEmail);
 
   try {
     const hashedPassword = hashPassword(password);
 
     // Create new user
-    const user = new User({ fullname, username, email, password: hashedPassword, role, isVerified: false });
+    const user = new User({ fullname, username, email: lowerCaseEmail, password: hashedPassword, role, isVerified: false });
     await user.save();
 
     // Generate verification code
     const verificationCode = random();
 
     // Store verification code in Redis with an expiration time
-    await redisClient.set(email, verificationCode, 900);
+    await redisClient.set(lowerCaseEmail, verificationCode, 1800);
+
+    // Construct the full path to the image in the public folder
+    const imageFilePath = path.join(__dirname, '../../public/eduplug_logo_1_copy.png');
+
+    // Convert the image to Base64
+    const imageBase64 = fs.readFileSync(imageFilePath, 'base64');
+    const base64Logo = `data:image/png;base64,${imageBase64}`;
+
+    const verificationLink = `http://localhost:5173/verify-email?token=${verificationCode}&email=${encodeURIComponent(lowerCaseEmail)}`;
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <div style="text-align: center;">
+          <img src="${base64Logo}" alt="EduPlug Logo" style="width: 150px;"/>
+        </div>
+        <h2 style="text-align: center;">Welcome to EduPlug!</h2>
+        <p>Hi <strong>${fullname}</strong>,</p>
+        <p>Thank you for signing up. Please verify your email by using the code below:</p>
+        <P><em>code expires in 30 minutes<em></p>
+        <h3 style="color: #007bff;">${verificationCode}</h3>
+        <p>Alternatively, you can click the following link to verify your email:</p>
+        <a href="${verificationLink}" style="background-color: #007bff; color: #fff; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Verify Email</a>
+        <p>If you didn’t sign up, you can ignore this email.</p>
+        <br />
+        <p>Thanks, <br/> The EduPlug Team</p>
+      </div>
+    `;
 
     // Send verification email using nodemailer
     const transporter = nodemailer.createTransport({
@@ -49,12 +78,13 @@ export const register = async (req: Request, res: Response): Promise<Response> =
     });
 
     const mailOptions = {
-      from: 'noreply@example.com',
+      from: '"EduPlug" <noreply@example.com>',  // Customize the sender
       to: email,
       subject: 'Verify Your Email',
-      text: `Your email verification code is: ${verificationCode}`,
+      html: htmlBody,  // Use the HTML email template
     };
-
+    
+    // Send the email
     transporter.sendMail(mailOptions, (error: Error | null, info: any) => {
       if (error) {
         console.error('Error sending verification email:', error);
@@ -62,10 +92,19 @@ export const register = async (req: Request, res: Response): Promise<Response> =
         console.log('Verification email sent:', info.response);
       }
     });
-
+    
     return res.status(201).json({ message: 'User registered. Please check your email for verification.' });
   } catch (error) {
-    if (error instanceof Error) {
+    if (error instanceof MongoError && error.code === 11000) {
+      // Check which field caused the duplicate key error
+      if (error.message.includes('email_1')) {
+        return res.status(400).json({ error: 'Email already exists' });
+      } else if (error.message.includes('username_1')) {
+        return res.status(400).json({ error: 'Username already exists' });
+      } else {
+        return res.status(400).json({ error: 'Duplicate key error' });
+      }
+    } else if (error instanceof Error) {
       return res.status(400).json({ error: error.message });
     } else {
       return res.status(400).json({ error: 'Unknown error occurred' });
@@ -73,54 +112,80 @@ export const register = async (req: Request, res: Response): Promise<Response> =
   }
 };
 
-// Verify email
-export const verifyEmail = async (req: Request, res: Response): Promise<Response> => {
-  const { email, code } = req.body;
+// Verify email by either token (link) or code (manual entry)
+export const verifyEmail = async (req: Request<{}, {}, RequestType>, res: Response): Promise<Response> => {
+  // Extract email and code/token
+  const email = req.body.email
+  const token = req.body.token
+
+  // Ensure both email and token are provided
+  if (!email || !token) {
+    return res.status(400).json({ error: 'Email and token are required' });
+  }
+
+  // Lowercase email to ensure consistency
+  const lowerEmail = typeof email === 'string' ? email.toLowerCase() : '';
+  if (!lowerEmail) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
 
   try {
-    // find user and check if verified
-    const user = await User.findOne({ email });
+    // Find the user by email
+    const user = await User.findOne({ email: lowerEmail });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // If user is already verified, return an error
     if (user.isVerified) {
       return res.status(403).json({ error: 'Email already verified' });
     }
 
-    // get cached code from redis
-    const verificationToken = await redisClient.get(email);
-    if (!verificationToken) {
-          return res.status(404).json({ error: 'Verification code not found' });
-        }
-    // delete the cached code from redis db
-    await redisClient.del(email)
+    // Get verification code from Redis using the lowercase email
+    const verificationCode = await redisClient.get(lowerEmail);
+    if (!verificationCode) {
+      return res.status(400).json({ error: 'Verification code has expired or is invalid' });
+    }
 
-    // verify code
-    if (code === verificationToken) { 
-      user.isVerified = true;
-      await user.save();
-      return res.json({ message: 'Email verified successfully' });
-    } else {
+    // Compare provided code with the stored verification code
+    if (token !== verificationCode) {
       return res.status(400).json({ error: 'Invalid verification code' });
     }
+
+    // Mark the user as verified
+    user.isVerified = true;
+    await user.save();
+
+    // Delete the verification code from Redis
+    await redisClient.del(lowerEmail);
+
+    // Generate session token for the user
+    const sessionToken = generateToken(user._id, user.role);
+
+    // Send the JWT in an HTTP-only cookie
+    res.cookie('token', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Enable secure flag in production
+      sameSite: 'strict', // Prevent CSRF
+      maxAge: 60 * 60 * 1000, // 1 hour expiration
+    });
+
+    return res.status(200).json({ message: 'Email verified successfully' });
   } catch (error) {
-    if (error instanceof Error) {
-      return res.status(500).json({ error: error.message });
-    } else {
-      return res.status(500).json({ error: 'Unknown error occurred' });
-    }
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
+
 // Login
-export const login = async (req: Request, res: Response): Promise<Response> => {
+export const login = async (req: Request<{}, {}, RequestType>, res: Response): Promise<Response> => {
   const { email, password } = req.body;
+  const lowerCaseEmail = email.toLowerCase()
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: lowerCaseEmail }).select('+password');
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'Invalid login credentials' });
     }
 
     if (!user.isVerified) {
@@ -129,11 +194,20 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid login credentials' });
     }
 
     const token = generateToken(user._id, user.role);
-    return res.status(200).json({ token, user });
+
+    // Send JWT in an HTTP-only cookie
+    res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // true in production for HTTPS
+    sameSite: 'strict', // prevent CSRF
+    maxAge: 60 * 60 * 1000, // 1 hour
+    });
+
+    return res.status(200).json({ message: 'Login successful' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ error: error.message });
@@ -143,36 +217,28 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
-// Get user profile
-export const getProfile = async (req: Request, res: Response): Promise<Response> => {
-  try {
-    const user = await User.findById(req.user?._id);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    return res.json(user);
-  } catch (error) {
-    if (error instanceof Error) {
-      return res.status(500).json({ error: 'Server error' });
-    } else {
-      return res.status(500).json({ error: 'Unknown error occurred' });
-    }
-  }
+// logout controller
+export const logout = async (req: Request, res: Response): Promise<Response> => {
+  res.clearCookie('token'); // Clear the token cookie
+  return res.status(200).send({ message: 'Logged out successfully' });
 };
 
-// Update user profile
-export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
-  try {
-    const user = await User.findByIdAndUpdate(req.user?._id, req.body, { new: true });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    return res.json(user);
-  } catch (error) {
-    if (error instanceof Error) {
-      return res.status(500).json({ error: 'Server error' });
-    } else {
-      return res.status(500).json({ error: 'Unknown error occurred' });
-    }
+// check authentication for users
+export const checkAuth = async (req: Request, res: Response): Promise<Response> => {
+  if (req.user) {
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const profilePicUrl = req.user.profilePic ? `${baseUrl}${req.user.profilePic}` : null;
+    
+    // Return the user object with full profilePic URL
+    return res.status(200).json({ 
+      message: 'Authenticated', 
+      user: {
+        ...req.user.toObject(),
+        profilePic: profilePicUrl // Ensure full URL is returned
+      }
+    });
   }
+
+  return res.status(401).json({ message: 'Not authenticated' });
 };
+

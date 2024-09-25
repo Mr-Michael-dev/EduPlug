@@ -1,0 +1,96 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+
+
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+.login-page, .register-page, .profile-page, .post-upload-page, .admin-dashboard {
+  padding: 20px;
+}
+
+input, textarea {
+  display: block;
+  margin: 10px 0;
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* styles.css */
+
+/* General styles for anchor tags */
+a {
+  text-decoration: none;  /* Removes underline */
+  color: #007bff;         /* Default color for links */
+  transition: color 0.3s ease; /* Smooth transition on hover */
+}
+
+/* Hover effect for anchor tags */
+a:hover {
+  color: #0056b3;         /* Darker blue on hover */
+  text-decoration: underline; /* Optional: adds underline on hover */
+}
+
+/* Remove list style and padding */
+ul, ol {
+  list-style-type: none;  /* Removes bullet points or numbers */
+  padding: 0;             /* Removes default padding */
+  margin: 0;              /* Removes default margin */
+}
+
+/* Style for list items */
+li {
+  padding: 5px 0;         /* Optional: add some padding between list items */
+}
+
+/* Hover effect for list items with anchor tags */

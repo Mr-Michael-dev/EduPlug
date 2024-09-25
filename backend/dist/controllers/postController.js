@@ -1,67 +1,72 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+import { Post } from '../models/Post.js';
+import { fileUploader } from '../utils/upload.js';
+const uploadPostBanner = fileUploader('./uploads/post-banners').single('banner');
+// Create post for contributors
+export const createPost = async (req, res) => {
+    uploadPostBanner(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ error: err.message });
+        }
+        // Fixed the condition for checking user role
+        if (req.user?.role !== 'contributor' && req.user?.role !== 'admin') {
+            return res.status(403).json({ error: 'Only contributors or admins can create posts' });
+        }
+        const { title, content } = req.body;
+        try {
+            const post = new Post({
+                title,
+                content,
+                banner: `/uploads/post-banners/${req.file?.filename}`,
+                author: req.user._id
+            });
+            await post.save();
+            return res.status(201).json(post);
+        }
+        catch (error) {
+            return res.status(400).json({ error: error.message });
+        }
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.likePost = exports.getPosts = exports.updatePost = exports.getPostById = exports.deletePost = exports.createPost = void 0;
-const Post_1 = require("../models/Post");
-// Create post for contributors
-const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) !== 'contributor') {
-        res.status(403).json({ error: 'Only contributors can create posts' });
-        return; // Return here after sending the response
-    }
-    const { title, content } = req.body;
-    try {
-        const post = new Post_1.Post({ title, content, author: req.user._id });
-        yield post.save();
-        res.status(201).json(post);
-    }
-    catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-exports.createPost = createPost;
 // Delete post (Admins or post authors can delete)
-const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    const post = yield Post_1.Post.findById(req.params.id);
+export const deletePost = async (req, res) => {
+    const post = await Post.findById(req.params.id);
     if (!post) {
         res.status(404).json({ error: 'Post not found' });
         return;
     }
-    if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) !== 'admin' && post.author.toString() !== ((_b = req.user) === null || _b === void 0 ? void 0 : _b._id.toString())) {
+    if (req.user?.role !== 'admin' && post.author.toString() !== req.user?._id.toString()) {
         res.status(403).json({ error: 'Unauthorized' });
         return;
     }
-    yield post.deleteOne(); // Updated here
+    await post.deleteOne(); // Updated here
     res.json({ message: 'Post deleted' });
-});
-exports.deletePost = deletePost;
-const getPostById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const getPostById = async (req, res) => {
     try {
-        const post = yield Post_1.Post.findById(req.params.id).populate('author', 'username');
+        const post = await Post.findById(req.params.id)
+            .populate('author', 'username')
+            .populate('comments');
         if (!post) {
             res.status(404).json({ error: 'Post not found' });
             return;
         }
-        res.json(post);
+        // Generate the base URL for the banner image
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        // Construct the full URL for the banner image if it exists
+        const bannerUrl = post.banner ? `${baseUrl}${post.banner}` : null;
+        // Return the post with the full banner URL
+        res.json({
+            ...post.toObject(),
+            banner: bannerUrl // Full URL for the banner image
+        });
     }
     catch (error) {
         res.status(400).json({ error: error.message });
     }
-});
-exports.getPostById = getPostById;
-const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const updatePost = async (req, res) => {
     try {
-        const post = yield Post_1.Post.findById(req.params.id);
+        const post = await Post.findById(req.params.id);
         if (!post) {
             res.status(404).json({ error: 'Post not found' });
             return;
@@ -71,25 +76,60 @@ const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             return;
         }
         post.title = req.body.title || post.title;
-        post.body = req.body.body || post.body;
+        post.content = req.body.content || post.content;
         post.tags = req.body.tags || post.tags;
-        yield post.save();
+        await post.save();
         res.json(post);
     }
     catch (error) {
         res.status(400).json({ error: error.message });
     }
-});
-exports.updatePost = updatePost;
-// Visitors can view posts
-const getPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const posts = yield Post_1.Post.find().populate('author', 'username').populate('comments');
-    res.status(200).json(posts);
-});
-exports.getPosts = getPosts;
-const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+// Visitors can view post
+export const getPosts = async (req, res) => {
     try {
-        const post = yield Post_1.Post.findById(req.params.id);
+        // Parse the page and limit query parameters, set defaults if not provided
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        // Calculate the number of posts to skip for pagination
+        const skip = (page - 1) * limit;
+        // Fetch the total number of posts
+        const totalPosts = await Post.countDocuments();
+        // Find the posts with pagination, and populate related data
+        const posts = await Post.find()
+            .populate('author', 'username profilePic')
+            .populate('comments')
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 }); // Optionally sort posts by creation date (latest first)
+        // Generate the base URL for the banner images
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        // Map through posts to construct the full URL for each banner image
+        const postsWithFullBannerUrls = posts.map(post => {
+            const profilePicUrl = post.author?.profilePic ? `${baseUrl}${post.author.profilePic}` : null;
+            const bannerUrl = post.banner ? `${baseUrl}${post.banner}` : null;
+            return {
+                ...post.toObject(),
+                banner: bannerUrl,
+                author: { profilePic: profilePicUrl }
+            };
+        });
+        // Send the paginated data along with meta information
+        res.status(200).json({
+            currentPage: page,
+            totalPages: Math.ceil(totalPosts / limit),
+            totalPosts,
+            hasMore: page * limit < totalPosts,
+            posts: postsWithFullBannerUrls
+        });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+export const likePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
         if (!post) {
             res.status(404).json({ error: 'Post not found' });
             return;
@@ -103,11 +143,10 @@ const likePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         post.likes = post.likes.filter((user) => user.toString() !== req.user._id.toString());
-        yield post.save();
+        await post.save();
         res.json(post);
     }
     catch (error) {
         res.status(400).json({ error: error.message });
     }
-});
-exports.likePost = likePost;
+};

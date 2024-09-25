@@ -1,0 +1,21 @@
+/* For general post content: Wrap text and prevent overflow */
+.post-content {
+    word-wrap: break-word; /* Wrap long words */
+    word-break: break-word; /* Break long URLs or words */
+    white-space: normal; /* Ensure that regular text wraps */
+  }
+  
+  /* For code blocks: Allow horizontal scrolling for long lines */
+  pre {
+    background-color: #000000; /* Light gray background */
+    padding: 15px;
+    border-radius: 5px;
+    color: #39e233;
+  }
+  
+  code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    color: #d63384; /* Distinct color for code */
+  }
+  

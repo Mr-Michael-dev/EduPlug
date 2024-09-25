@@ -1,0 +1,26 @@
+.blog-container {
+  width: 70%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.post-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 20px;
+}
+
+.post-card-container {
+  transition: transform 0.2s ease-in-out;
+}
+
+.post-card-container:hover {
+  transform: scale(1.05);
+}
+
+.loading {
+  text-align: center;
+  font-size: 18px;
+  color: gray;
+  margin: 20px 0;
+}

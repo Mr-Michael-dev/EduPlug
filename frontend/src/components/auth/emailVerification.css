@@ -1,0 +1,9 @@
+.verification-container {
+    position: relative; /* Ensure it's relative to handle the blur */
+    transition: filter 0.3s ease;
+}
+  
+.verification-container.blur {
+    filter: blur(4px); /* Adjust blur level as needed */
+}
+  

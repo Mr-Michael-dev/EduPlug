@@ -1,0 +1,49 @@
+/* Home Page Styling */
+.home-container {
+    text-align: center;
+    padding: 50px 20px;
+  }
+  
+  .home-heading {
+    font-size: 3rem;
+    color: #3498db;
+  }
+  
+  /* Post Card Styling */
+  .card {
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-img-top {
+    max-height: 200px;
+    object-fit: cover;
+  }
+  
+  .card-body {
+    padding: 20px;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .card-text {
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .btn-primary {
+    background-color: #3498db;
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2980b9;
+  }
+  
+ 

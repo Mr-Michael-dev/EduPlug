@@ -1,9 +1,12 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import { User } from '../models/User';
+import { User } from '../models/User.js';
 
+// middleware for protecting routes
 export const protect = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  let token = req.headers.authorization?.split(' ')[1];
+  
+  const token = req.cookies.token; // get token from cookies
+  
   if (!token) {
     res.status(401).json({ error: 'Not authorized' });
     return;
@@ -18,6 +21,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
   }
 };
 
+// middleware for authorizing roles
 export const authorizeRoles = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!roles.includes(req.user?.role)) {
@@ -27,3 +31,15 @@ export const authorizeRoles = (...roles: string[]) => {
     next();
   };
 };
+
+export const checkAdminToken = (req: Request, res: Response, next: NextFunction): void => {
+  const { token } = req.body;  // Get token from the request body
+
+  if (token === process.env.ADMIN_REGISTRATION_TOKEN) {
+    next();  // Proceed if the token matches
+  } else {
+    res.status(403).json({ message: "Forbidden: Invalid admin token" });  // Block access if token is incorrect
+  }
+};
+
+

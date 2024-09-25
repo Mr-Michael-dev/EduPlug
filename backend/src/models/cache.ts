@@ -1,4 +1,4 @@
-import redisClient from '../db/redis';
+import redisClient from '../db/redis.js';
 import { Request, Response, NextFunction } from 'express';
 
 const cacheTimeout = process.env.CACHE_TIMEOUT || 600;
