@@ -1,44 +1,4 @@
 /// <reference types="express" />
-<<<<<<< HEAD
-/// <reference path="../types/express/express.d.ts" />
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateProfile = exports.getProfile = exports.login = exports.verifyEmail = exports.register = exports.protect = void 0;
-const User_1 = require("../models/User");
-const helpers_1 = require("../helpers");
-const redis_1 = __importDefault(require("../db/redis")); // Redis redisClient
-const nodemailer_1 = __importDefault(require("nodemailer")); // For sending verification emails
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-// Middleware for protecting routes
-const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    let token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
-    if (!token) {
-        res.status(401).json({ error: 'Not authorized' });
-        return;
-    }
-    try {
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || 'CLETA-REST-API');
-        req.user = yield User_1.User.findById(decoded.id).select('-password');
-        next();
-    }
-    catch (error) {
-        res.status(401).json({ error: 'Not authorized, token failed' });
-    }
-});
-exports.protect = protect;
-=======
 /// <reference path="../../express.d.ts" />
 import { User } from '../models/User.js';
 import { generateToken, hashPassword, random } from '../utils/index.js';
@@ -51,7 +11,6 @@ import { fileURLToPath } from 'url';
 // Get __filename and __dirname in ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
->>>>>>> cd32b3d41311f94055d682a69f4e811433c89121
 // Register a new user
 export const register = async (req, res) => {
     const { fullname, username, email, password, role } = req.body;
@@ -65,9 +24,6 @@ export const register = async (req, res) => {
         // Generate verification code
         const verificationCode = random();
         // Store verification code in Redis with an expiration time
-<<<<<<< HEAD
-        yield redis_1.default.set(email, verificationCode, 900);
-=======
         await redisClient.set(lowerCaseEmail, verificationCode, 1800);
         // Construct the full path to the image in the public folder
         const imageFilePath = path.join(__dirname, '../../public/eduplug_logo_1_copy.png');
@@ -92,7 +48,6 @@ export const register = async (req, res) => {
         <p>Thanks, <br/> The EduPlug Team</p>
       </div>
     `;
->>>>>>> cd32b3d41311f94055d682a69f4e811433c89121
         // Send verification email using nodemailer
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
@@ -160,22 +115,6 @@ export const verifyEmail = async (req, res) => {
         if (user.isVerified) {
             return res.status(403).json({ error: 'Email already verified' });
         }
-<<<<<<< HEAD
-        // get cached code from redis
-        const verificationToken = yield redis_1.default.get(email);
-        if (!verificationToken) {
-            return res.status(404).json({ error: 'Verification code not found' });
-        }
-        // delete the cached code from redis db
-        yield redis_1.default.del(email);
-        // verify code
-        if (code === verificationToken) {
-            user.isVerified = true;
-            yield user.save();
-            return res.json({ message: 'Email verified successfully' });
-        }
-        else {
-=======
         // Get verification code from Redis using the lowercase email
         const verificationCode = await redisClient.get(lowerEmail);
         if (!verificationCode) {
@@ -183,7 +122,6 @@ export const verifyEmail = async (req, res) => {
         }
         // Compare provided code with the stored verification code
         if (token !== verificationCode) {
->>>>>>> cd32b3d41311f94055d682a69f4e811433c89121
             return res.status(400).json({ error: 'Invalid verification code' });
         }
         // Mark the user as verified

@@ -44,7 +44,7 @@ export const deletePost = async (req, res) => {
 export const getPostById = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id)
-            .populate('author', 'username')
+            .populate('author', 'username profilePic')
             .populate('comments');
         if (!post) {
             res.status(404).json({ error: 'Post not found' });
@@ -54,10 +54,12 @@ export const getPostById = async (req, res) => {
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         // Construct the full URL for the banner image if it exists
         const bannerUrl = post.banner ? `${baseUrl}${post.banner}` : null;
+        const profilePicUrl = post.author?.profilePic ? `${baseUrl}${post.author.profilePic}` : null;
         // Return the post with the full banner URL
         res.json({
             ...post.toObject(),
-            banner: bannerUrl // Full URL for the banner image
+            banner: bannerUrl,
+            profilePic: profilePicUrl
         });
     }
     catch (error) {

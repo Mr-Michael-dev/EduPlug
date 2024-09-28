@@ -53,7 +53,7 @@ export const deletePost = async (req: Request, res: Response): Promise<void> => 
 export const getPostById = async (req: Request, res: Response): Promise<void> => {
   try {
     const post = await Post.findById(req.params.id)
-      .populate('author', 'username')
+      .populate('author', 'username profilePic')
       .populate('comments');
     
     if (!post) {
@@ -65,11 +65,14 @@ export const getPostById = async (req: Request, res: Response): Promise<void> =>
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     // Construct the full URL for the banner image if it exists
     const bannerUrl = post.banner ? `${baseUrl}${post.banner}` : null;
+
+    const profilePicUrl = post.author?.profilePic ? `${baseUrl}${post.author.profilePic}` : null;
     
     // Return the post with the full banner URL
     res.json({
       ...post.toObject(),  // Convert the post to a plain object
-      banner: bannerUrl     // Full URL for the banner image
+      banner: bannerUrl,     // Full URL for the banner image
+      profilePic: profilePicUrl
     });
   } catch (error: any) {
     res.status(400).json({ error: error.message });

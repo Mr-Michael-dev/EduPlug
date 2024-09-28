@@ -14,11 +14,7 @@ const cache = async (req, res, next) => {
             res.send = (body) => {
                 sendResponse(body); // Send the response immediately
                 // After response is sent, store it in Redis cache
-<<<<<<< HEAD
-                redis_1.default.set(key, JSON.stringify(body), typeof cacheTimeout === 'string' ? parseInt(cacheTimeout) : cacheTimeout).catch((err) => {
-=======
                 redisClient.set(key, JSON.stringify(body), typeof cacheTimeout === 'string' ? parseInt(cacheTimeout) : cacheTimeout).catch((err) => {
->>>>>>> cd32b3d41311f94055d682a69f4e811433c89121
                     console.error('Redis set error:', err);
                 });
                 return res; // Return the response object
