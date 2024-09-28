@@ -69,7 +69,7 @@ function SignUp() {
         };
 
         const response = await axios.post(
-          '/api/v1/users/signup',
+          'http://localhost:5000/api/v1/users/signup',
           userData,
           {
             headers: {

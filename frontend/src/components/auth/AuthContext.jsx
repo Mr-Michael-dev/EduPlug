@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   // Function to fetch authenticated user from backend (checkauth)
   const checkAuth = async () => {
     try {
-      const response = await axios.post('/api/v1/users/check-auth', {}, { withCredentials: true });
+      const response = await axios.post('http://localhost:5000/api/v1/users/check-auth', {}, { withCredentials: true });
       if (response.status === 200) {
         setUser(response.data.user);
         setIsAuthenticated(true);
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('/api/v1/users/logout', {}, { withCredentials: true });
+      await axios.post('http://localhost:5000/api/v1/users/logout', {}, { withCredentials: true });
       setUser(null);
       setIsAuthenticated(false);
       setIsAdmin(false);

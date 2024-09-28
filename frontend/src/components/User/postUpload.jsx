@@ -48,7 +48,7 @@ function PostUpload() {
     formData.append('banner', postBanner); // Upload the banner image
 
     try {
-      const response = await axios.post('/api/v1/posts', formData, {
+      const response = await axios.post('http://localhost:5000/api/v1/posts', formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',

@@ -31,7 +31,7 @@ function EmailVerification() {
   const verifyEmailWithToken = async (token, email) => {
     try {
       setShowSpinner(true); // Show spinner during verification
-      const response = await axios.post('/api/v1/users/verify-email', { token, email }, { withCredentials: true });
+      const response = await axios.post('http://localhost:5000/api/v1/users/verify-email', { token, email }, { withCredentials: true });
 
       if (response.status === 200) {
         setVerified(true);
@@ -60,7 +60,7 @@ function EmailVerification() {
         setSubmitting(true);
         setVerificationError(null);
 
-        const response = await axios.post('/api/v1/users/verify-email', { email, token: verificationCode }, { withCredentials: true });
+        const response = await axios.post('http://localhost:5000/api/v1/users/verify-email', { email, token: verificationCode }, { withCredentials: true });
 
         if (response.status === 200) {
           setShowSpinner(true);
