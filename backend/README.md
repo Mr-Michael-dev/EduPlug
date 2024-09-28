@@ -9,7 +9,8 @@ npm install express mongoose bcryptjs jsonwebtoken dotenv body-parser cors swagg
 npm install jest supertest
 ```
 
-To install all dependencies run ```sh 
+To install all dependencies run 
+```sh 
 npm install
 ```
 
