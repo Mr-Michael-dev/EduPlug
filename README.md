@@ -31,29 +31,29 @@ The project is divided into two directory; [backend](./backend/) which hamdles t
 ## Contributing
 1. Fork the repository.
 
-### Clone the Repository
+2. Clone the Repository
 ```sh
 git clone https://github.com/Mr-Michael-dev/EduPlug.git
 cd EduPlug
 ```
 
-2. Create a new branch (`git checkout -b feature-branch`).
-### Backend Setup
-```sh
-cd backend
-vi README.md
-```
+3. Create a new branch (`git checkout -b feature-branch`).
+- ### Backend Setup
+    ```sh
+    cd backend
+    vi README.md
+    ```
 
-### frontend Setup
-```sh
-cd frontend
-vi README.md
-```
+- ### frontend Setup
+    ```sh
+    cd frontend
+    vi README.md
+    ```
 
-3. Make your changes.
-4. Commit your changes (`git commit -m 'Add some feature'`).
-5. Push to the branch (`git push origin feature-branch`).
-6. Create a new Pull Request.
+4. Make your changes.
+5. Commit your changes (`git commit -m 'Add some feature'`).
+6. Push to the branch (`git push origin feature-branch`).
+7. Create a new Pull Request.
 
 ## Authors
 See the [AUTHORS](AUTHORS) file for details.
