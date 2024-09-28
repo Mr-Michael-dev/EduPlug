@@ -32,12 +32,15 @@ The project is divided into two directory; [backend](./backend/) which hamdles t
 1. Fork the repository.
 
 2. Clone the Repository
-```sh
-git clone https://github.com/Mr-Michael-dev/EduPlug.git
-cd EduPlug
-```
+- ```sh
+    git clone https://github.com/Mr-Michael-dev/EduPlug.git
+    cd EduPlug
+    ```
 
-3. Create a new branch (`git checkout -b feature-branch`).
+3. Create a new branch 
+-   ```sh
+    git checkout -b feature-branch
+    ```
 - ### Backend Setup
     ```sh
     cd backend
@@ -51,8 +54,14 @@ cd EduPlug
     ```
 
 4. Make your changes.
-5. Commit your changes (`git commit -m 'Add some feature'`).
-6. Push to the branch (`git push origin feature-branch`).
+5. Commit your changes 
+- ```sh
+    git commit -m 'Add some feature'
+    ```
+6. Push to the branch
+- ```sh
+    git push origin feature-branch
+    ```
 7. Create a new Pull Request.
 
 ## Authors
